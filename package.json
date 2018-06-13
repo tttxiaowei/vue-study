@@ -1,0 +1,26 @@
+{
+  "name": "vue-study",
+  "version": "1.0.0",
+  "description": "vue stack study",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaoweiyxzmd/vue-study.git"
+  },
+  "keywords": [
+    "vue"
+  ],
+  "author": "xiaoweiyxzmd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xiaoweiyxzmd/vue-study/issues"
+  },
+  "homepage": "https://github.com/xiaoweiyxzmd/vue-study#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
