@@ -490,7 +490,7 @@
      */
     var bailRE = /[^\w.$]/;
 
-    function parsePath(path) {      // 根据对象取值路径字符串'a.b.c.d'返回一个函数，之后调用函数，掺入对象obj，就返回obj.a.b.c.d的值
+    function parsePath(path) {      // 根据对象取值路径字符串'a.b.c.d'返回一个函数，之后调用函数，传入对象obj，就返回obj.a.b.c.d的值
         if (bailRE.test(path)) {
             return
         }
@@ -846,9 +846,9 @@
  */
 
     var arrayProto = Array.prototype;
-    var arrayMethods = Object.create(arrayProto);
+    var arrayMethods = Object.create(arrayProto);       // 以数组原型为原型，新建对象，用于存放数组变异方法
 
-    var methodsToPatch = [
+    var methodsToPatch = [      // 数组变异方法名
         'push',
         'pop',
         'shift',
@@ -861,7 +861,7 @@
     /**
      * Intercept mutating methods and emit events
      */
-    methodsToPatch.forEach(function (method) {
+    methodsToPatch.forEach(function (method) {      // 对数组方法进行变异，实现双向绑定
         // cache original method
         var original = arrayProto[method];
         def(arrayMethods, method, function mutator() {
@@ -891,7 +891,7 @@
 
     /*  */
 
-    var arrayKeys = Object.getOwnPropertyNames(arrayMethods);
+    var arrayKeys = Object.getOwnPropertyNames(arrayMethods);       // 变异方法名
 
     /**
      * In some cases we may want to disable observation inside a component's
@@ -909,12 +909,12 @@
      * object's property keys into getter/setters that
      * collect dependencies and dispatch updates.
      */
-    var Observer = function Observer(value) {
+    var Observer = function Observer(value) {       // 观察者构造函数
         this.value = value;
         this.dep = new Dep();
         this.vmCount = 0;
         def(value, '__ob__', this);
-        if (Array.isArray(value)) {
+        if (Array.isArray(value)) {     // 如果观察的是数组
             var augment = hasProto
                 ? protoAugment
                 : copyAugment;
@@ -940,7 +940,7 @@
     /**
      * Observe a list of Array items.
      */
-    Observer.prototype.observeArray = function observeArray(items) {
+    Observer.prototype.observeArray = function observeArray(items) {    // 观察数组的每个项
         for (var i = 0, l = items.length; i < l; i++) {
             observe(items[i]);
         }
@@ -952,7 +952,7 @@
      * Augment an target Object or Array by intercepting
      * the prototype chain using __proto__
      */
-    function protoAugment(target, src, keys) {
+    function protoAugment(target, src, keys) {     // 修改target的原型为src
         /* eslint-disable no-proto */
         target.__proto__ = src;
         /* eslint-enable no-proto */
@@ -964,7 +964,7 @@
      */
 
     /* istanbul ignore next */
-    function copyAugment(target, src, keys) {
+    function copyAugment(target, src, keys) {     // 扶着src的kyes里的方法到target
         for (var i = 0, l = keys.length; i < l; i++) {
             var key = keys[i];
             def(target, key, src[key]);
@@ -977,7 +977,7 @@
      * or the existing observer if the value already has one.
      */
     function observe(value, asRootData) {
-        if (!isObject(value) || value instanceof VNode) {
+        if (!isObject(value) || value instanceof VNode) {   // value不是对象或者是VNode的实例，则返回
             return
         }
         var ob;
@@ -1600,14 +1600,14 @@
         var value = propsData[key];
         // boolean casting
         var booleanIndex = getTypeIndex(Boolean, prop.type);
-        if (booleanIndex > -1) {
-            if (absent && !hasOwn(prop, 'default')) {
+        if (booleanIndex > -1) {    // 如果是prop的type中有Boolean
+            if (absent && !hasOwn(prop, 'default')) {       // 如果propsData中没有对应的prop，并且prop没有默认值
                 value = false;
-            } else if (value === '' || value === hyphenate(key)) {
+            } else if (value === '' || value === hyphenate(key)) {      // 如果propsData中prop值为''或者key
                 // only cast empty string / same name to boolean if
                 // boolean has higher priority
                 var stringIndex = getTypeIndex(String, prop.type);
-                if (stringIndex < 0 || booleanIndex < stringIndex) {
+                if (stringIndex < 0 || booleanIndex < stringIndex) {   // 如果是prop的type中没有String
                     value = true;
                 }
             }
@@ -1631,14 +1631,14 @@
     /**
      * Get the default value of a prop.
      */
-    function getPropDefaultValue(vm, prop, key) {
+    function getPropDefaultValue(vm, prop, key) {   // 获取默认属性值
         // no default, return undefined
         if (!hasOwn(prop, 'default')) {
             return undefined
         }
         var def = prop.default;
         // warn against non-factory defaults for Object & Array
-        if ("development" !== 'production' && isObject(def)) {
+        if ("development" !== 'production' && isObject(def)) {      // 如果prop默认值是对象，需要通过函数返回
             warn(
                 'Invalid default value for prop "' + key + '": ' +
                 'Props with type Object/Array must use a factory function ' +
@@ -2694,7 +2694,7 @@
     var activeInstance = null;
     var isUpdatingChildComponent = false;
 
-    function initLifecycle(vm) {        // 初始化生命周期
+    function initLifecycle(vm) {        // 初始化
         var options = vm.$options;
 
         // locate first non-abstract parent
@@ -2810,8 +2810,8 @@
         hydrating
     ) {
         vm.$el = el;
-        if (!vm.$options.render) {
-            vm.$options.render = createEmptyVNode;
+        if (!vm.$options.render) {      // 如果没有传render函数
+            vm.$options.render = createEmptyVNode;      // 使用默认的render函数
             {
                 /* istanbul ignore if */
                 if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
@@ -2830,7 +2830,7 @@
                 }
             }
         }
-        callHook(vm, 'beforeMount');
+        callHook(vm, 'beforeMount');        // 触发beforeMount钩子
 
         var updateComponent;
         /* istanbul ignore if */
@@ -3160,7 +3160,7 @@
      * and fires callback when the expression value changes.
      * This is used for both the $watch() api and directives.
      */
-    var Watcher = function Watcher(
+    var Watcher = function Watcher(     // 监听对象的构造函数
         vm,
         expOrFn,
         cb,
@@ -3174,7 +3174,7 @@
         vm._watchers.push(this);
         // options
         if (options) {
-            this.deep = !!options.deep;
+            this.deep = !!options.deep;     // 要想监听对象内部值的变化，需要加上deep, 监听对象内部对象则不用
             this.user = !!options.user;
             this.computed = !!options.computed;
             this.sync = !!options.sync;
@@ -3399,7 +3399,7 @@
         set: noop
     };
 
-    function proxy(target, sourceKey, key) {
+    function proxy(target, sourceKey, key) {        // 代理
         sharedPropertyDefinition.get = function proxyGetter() {
             return this[sourceKey][key]
         };
@@ -3409,7 +3409,7 @@
         Object.defineProperty(target, key, sharedPropertyDefinition);
     }
 
-    function initState(vm) {
+    function initState(vm) {    // 初始化处理参数
         vm._watchers = [];
         var opts = vm.$options;
         if (opts.props) {
@@ -3420,7 +3420,7 @@
         }
         if (opts.data) {
             initData(vm);
-        } else {
+        } else {        // 如果没有传data，则用空对象
             observe(vm._data = {}, true /* asRootData */);
         }
         if (opts.computed) {
@@ -3431,7 +3431,7 @@
         }
     }
 
-    function initProps(vm, propsOptions) {
+    function initProps(vm, propsOptions) {      // 初始化处理props
         var propsData = vm.$options.propsData || {};
         var props = vm._props = {};
         // cache prop keys so that future props updates can iterate using Array
@@ -3447,7 +3447,7 @@
             var value = validateProp(key, propsOptions, propsData, vm);
             /* istanbul ignore else */
             {
-                var hyphenatedKey = hyphenate(key);
+                var hyphenatedKey = hyphenate(key);     // 将属性名转换为短横线命名法，然后进行下面的校验
                 if (isReservedAttribute(hyphenatedKey) ||
                     config.isReservedAttr(hyphenatedKey)) {
                     warn(
@@ -3470,21 +3470,21 @@
             // static props are already proxied on the component's prototype
             // during Vue.extend(). We only need to proxy props defined at
             // instantiation here.
-            if (!(key in vm)) {
+            if (!(key in vm)) {     // 针对new Vue时传递的props，其他组件的props已经在定义时代理到其构造函数的原型上了，详见initProps$1
                 proxy(vm, "_props", key);
             }
         };
 
-        for (var key in propsOptions) loop(key);
+        for (var key in propsOptions) loop(key);    // 对每个属性进行处理
         toggleObserving(true);
     }
 
-    function initData(vm) {
+    function initData(vm) {     // 初始化处理data
         var data = vm.$options.data;
-        data = vm._data = typeof data === 'function'
+        data = vm._data = typeof data === 'function'    // data可以是函数或者对象
             ? getData(data, vm)
             : data || {};
-        if (!isPlainObject(data)) {
+        if (!isPlainObject(data)) {     // data为函数时必须返回对象
             data = {};
             "development" !== 'production' && warn(
                 'data functions should return an object:\n' +
@@ -3500,20 +3500,20 @@
         while (i--) {
             var key = keys[i];
             {
-                if (methods && hasOwn(methods, key)) {
+                if (methods && hasOwn(methods, key)) {      // data属性不能与method名重复
                     warn(
                         ("Method \"" + key + "\" has already been defined as a data property."),
                         vm
                     );
                 }
             }
-            if (props && hasOwn(props, key)) {
+            if (props && hasOwn(props, key)) {      // data属性不能与prop名重复
                 "development" !== 'production' && warn(
                     "The data property \"" + key + "\" is already declared as a prop. " +
                     "Use prop default value instead.",
                     vm
                 );
-            } else if (!isReserved(key)) {
+            } else if (!isReserved(key)) {      // 如果data名不是以$,_开头,则不会代理到vm上
                 proxy(vm, "_data", key);
             }
         }
@@ -3521,7 +3521,7 @@
         observe(data, true /* asRootData */);
     }
 
-    function getData(data, vm) {
+    function getData(data, vm) {        // 执行data函数，返回数据
         // #7573 disable dep collection when invoking data getters
         pushTarget();
         try {
@@ -3536,7 +3536,7 @@
 
     var computedWatcherOptions = {computed: true};
 
-    function initComputed(vm, computed) {
+    function initComputed(vm, computed) {       // 初始化处理computed
         // $flow-disable-line
         var watchers = vm._computedWatchers = Object.create(null);
         // computed properties are just getters during SSR
@@ -3544,7 +3544,7 @@
 
         for (var key in computed) {
             var userDef = computed[key];
-            var getter = typeof userDef === 'function' ? userDef : userDef.get;
+            var getter = typeof userDef === 'function' ? userDef : userDef.get;     // 获取计算属性的get函数
             if ("development" !== 'production' && getter == null) {
                 warn(
                     ("Getter is missing for computed property \"" + key + "\"."),
@@ -3554,11 +3554,11 @@
 
             if (!isSSR) {
                 // create internal watcher for the computed property.
-                watchers[key] = new Watcher(
+                watchers[key] = new Watcher(        // 监听每个computed属性
                     vm,
                     getter || noop,
                     noop,
-                    computedWatcherOptions
+                    computedWatcherOptions          // 计算属性，加上标志
                 );
             }
 
@@ -3577,20 +3577,20 @@
         }
     }
 
-    function defineComputed(
+    function defineComputed(        // 定义computed属性到vm上
         target,
         key,
         userDef
     ) {
-        var shouldCache = !isServerRendering();
-        if (typeof userDef === 'function') {
+        var shouldCache = !isServerRendering();     // 非服务端渲染则缓存
+        if (typeof userDef === 'function') {        // computed属性为函数
             sharedPropertyDefinition.get = shouldCache
                 ? createComputedGetter(key)
                 : userDef;
-            sharedPropertyDefinition.set = noop;
-        } else {
+            sharedPropertyDefinition.set = noop;    // 为函数时计算属性不能赋值
+        } else {        // computed属性为对象
             sharedPropertyDefinition.get = userDef.get
-                ? shouldCache && userDef.cache !== false
+                ? shouldCache && userDef.cache !== false    // 计算属性的cache即将弃用
                     ? createComputedGetter(key)
                     : userDef.get
                 : noop;
@@ -3620,38 +3620,38 @@
         }
     }
 
-    function initMethods(vm, methods) {
+    function initMethods(vm, methods) {     // 初始化处理methods
         var props = vm.$options.props;
         for (var key in methods) {
             {
-                if (methods[key] == null) {
+                if (methods[key] == null) {     // 方法不能为null,undefined
                     warn(
                         "Method \"" + key + "\" has an undefined value in the component definition. " +
                         "Did you reference the function correctly?",
                         vm
                     );
                 }
-                if (props && hasOwn(props, key)) {
+                if (props && hasOwn(props, key)) {           // 方法名不能为与prop名重复
                     warn(
                         ("Method \"" + key + "\" has already been defined as a prop."),
                         vm
                     );
                 }
-                if ((key in vm) && isReserved(key)) {
+                if ((key in vm) && isReserved(key)) {       // 方法名不能是以$，_开头的vue内置形式 且在vm上已存在，
                     warn(
                         "Method \"" + key + "\" conflicts with an existing Vue instance method. " +
                         "Avoid defining component methods that start with _ or $."
                     );
                 }
             }
-            vm[key] = methods[key] == null ? noop : bind(methods[key], vm);
+            vm[key] = methods[key] == null ? noop : bind(methods[key], vm);     // 直接将mehods中的方法定义到vm上
         }
     }
 
-    function initWatch(vm, watch) {
+    function initWatch(vm, watch) {     // 初始化处理watch
         for (var key in watch) {
             var handler = watch[key];
-            if (Array.isArray(handler)) {
+            if (Array.isArray(handler)) {       // watch变量的可以是一个函数数组
                 for (var i = 0; i < handler.length; i++) {
                     createWatcher(vm, key, handler[i]);
                 }
@@ -3661,17 +3661,17 @@
         }
     }
 
-    function createWatcher(
+    function createWatcher(     // 处理创建监听的参数，然后调用vm.$watch创建监听
         vm,
         expOrFn,
         handler,
         options
     ) {
-        if (isPlainObject(handler)) {
+        if (isPlainObject(handler)) {   // 如果第三个第四个参数合并成一个对象
             options = handler;
             handler = handler.handler;
         }
-        if (typeof handler === 'string') {
+        if (typeof handler === 'string') {  // 处理函数是vm上的函数
             handler = vm[handler];
         }
         return vm.$watch(expOrFn, handler, options)
@@ -3707,22 +3707,22 @@
         Vue.prototype.$set = set;
         Vue.prototype.$delete = del;
 
-        Vue.prototype.$watch = function (
+        Vue.prototype.$watch = function (       // 创建监听
             expOrFn,
             cb,
             options
         ) {
             var vm = this;
-            if (isPlainObject(cb)) {
+            if (isPlainObject(cb)) {    // 如果cb合并到options中，先处理参数
                 return createWatcher(vm, expOrFn, cb, options)
             }
             options = options || {};
             options.user = true;
-            var watcher = new Watcher(vm, expOrFn, cb, options);
-            if (options.immediate) {
+            var watcher = new Watcher(vm, expOrFn, cb, options);    // 创建监听
+            if (options.immediate) {        //  马上执行监听函数
                 cb.call(vm, watcher.value);
             }
-            return function unwatchFn() {
+            return function unwatchFn() {       // 返回取消监听函数
                 watcher.teardown();
             }
         };
@@ -4739,14 +4739,14 @@
             }
             // expose real self
             vm._self = vm;
-            initLifecycle(vm);      // 初始化生命周期
+            initLifecycle(vm);      // 初始化
             initEvents(vm);
             initRender(vm);
-            callHook(vm, 'beforeCreate');
+            callHook(vm, 'beforeCreate');       // 触发beforeCreate钩子
             initInjections(vm); // resolve injections before data/props
             initState(vm);
             initProvide(vm); // resolve provide after data/props
-            callHook(vm, 'created');
+            callHook(vm, 'created');       // 触发created钩子
 
             /* istanbul ignore if */
             if ("development" !== 'production' && config.performance && mark) {
@@ -4963,7 +4963,7 @@
         };
     }
 
-    function initProps$1(Comp) {
+    function initProps$1(Comp) {    // 将props代理到组件构造函数的原型上
         var props = Comp.options.props;
         for (var key in props) {
             proxy(Comp.prototype, "_props", key);
@@ -5219,7 +5219,7 @@
 
 // these are reserved for web because they are directly compiled away
 // during template compilation
-    var isReservedAttr = makeMap('style,class');
+    var isReservedAttr = makeMap('style,class');        // 判断是否为web内置属性
 
 // attributes that should be using props for binding
     var acceptValue = makeMap('input,textarea,option,select,progress');
@@ -5425,14 +5425,14 @@
     /**
      * Query an element selector if it's not an element already.
      */
-    function query(el) {
+    function query(el) {        // 查询dom借点
         if (typeof el === 'string') {
             var selected = document.querySelector(el);
             if (!selected) {
                 "development" !== 'production' && warn(
                     'Cannot find element: ' + el
                 );
-                return document.createElement('div')
+                return document.createElement('div')    // 如果没有找到el，报错并且返回一个新div
             }
             return selected
         } else {
@@ -8777,7 +8777,7 @@
     Vue.prototype.__patch__ = inBrowser ? patch : noop;
 
 // public mount method
-    Vue.prototype.$mount = function (
+    Vue.prototype.$mount = function (       // 挂载函数
         el,
         hydrating
     ) {
@@ -11164,20 +11164,20 @@
 
     /*  */
 
-    var idToTemplate = cached(function (id) {
+    var idToTemplate = cached(function (id) {       // 获取某个id元素的innerHTML
         var el = query(id);
         return el && el.innerHTML
     });
 
     var mount = Vue.prototype.$mount;
-    Vue.prototype.$mount = function (
+    Vue.prototype.$mount = function (       // 重新写prototype.$mount
         el,
         hydrating
     ) {
         el = el && query(el);
 
         /* istanbul ignore if */
-        if (el === document.body || el === document.documentElement) {
+        if (el === document.body || el === document.documentElement) {      // 不能挂载到html,body
             "development" !== 'production' && warn(
                 "Do not mount Vue to <html> or <body> - mount to normal elements instead."
             );
@@ -11186,11 +11186,11 @@
 
         var options = this.$options;
         // resolve template/el and convert to render function
-        if (!options.render) {
+        if (!options.render) {      // 如果没有传render函数
             var template = options.template;
-            if (template) {
+            if (template) {     // 如果有template
                 if (typeof template === 'string') {
-                    if (template.charAt(0) === '#') {
+                    if (template.charAt(0) === '#') {       // 是字符串的话，
                         template = idToTemplate(template);
                         /* istanbul ignore if */
                         if ("development" !== 'production' && !template) {
@@ -11200,7 +11200,7 @@
                             );
                         }
                     }
-                } else if (template.nodeType) {
+                } else if (template.nodeType) {     // template是dom元素
                     template = template.innerHTML;
                 } else {
                     {
@@ -11235,14 +11235,14 @@
                 }
             }
         }
-        return mount.call(this, el, hydrating)
+        return mount.call(this, el, hydrating)      // 调用默认的$mount
     };
 
     /**
      * Get outerHTML of elements, taking care
      * of SVG elements in IE as well.
      */
-    function getOuterHTML(el) {
+    function getOuterHTML(el) {     // 获取元素的outerHTML
         if (el.outerHTML) {
             return el.outerHTML
         } else {

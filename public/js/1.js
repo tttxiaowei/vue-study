@@ -9,14 +9,40 @@ window.onload = function () {
         },
         created() {
             console.log(1231312312)
-        }
+        },
+        beforeCreate: [function () {
+            console.log(123)
+        }, function () {
+            console.log(456)
+        }]
 
     })
     let app = new Vue({
         el: '#app',
+        props: ['bbb', 'bbb-zzz'],
         data: {
-            message: 'hello world'
+            message: {AAA: 11111, bbb: {ccc: 1}},
+            _aaaessage: '111orld',
         },
+        computed: {
+            ds() {
+                return this.message;
+            }
+        },
+        watch: {
+            message: {
+                deep: true,
+                handler: function () {
+                    console.log(9999999);
+                }
+            }
+        },
+        methods: {
+            ssss: function () {
+            },
+            _message: function () {
+            },
+        }
     });
 };
 
