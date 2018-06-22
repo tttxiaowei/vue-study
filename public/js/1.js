@@ -8,21 +8,18 @@ window.onload = function () {
             };
         },
         created() {
-            console.log(1231312312)
+            setTimeout(()=>{
+                this.$forceUpdate()
+            }, 2000)
         },
-        beforeCreate: [function () {
-            console.log(123)
-        }, function () {
-            console.log(456)
-        }]
-
     })
     let app = new Vue({
         el: '#app',
         props: ['bbb', 'bbb-zzz'],
         data: {
-            message: {AAA: 11111, bbb: {ccc: 1}},
+            message: {AAA: 11111, bbb: {ccc: 1}, ddd: [5, 9]},
             _aaaessage: '111orld',
+            abcd: [5, 6, 7, 9, 1, 5, 8]
         },
         computed: {
             ds() {
@@ -42,7 +39,9 @@ window.onload = function () {
             },
             _message: function () {
             },
-        }
+        },
+        created() {
+        },
     });
 };
 

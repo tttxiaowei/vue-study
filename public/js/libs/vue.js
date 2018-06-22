@@ -79,7 +79,7 @@
      * Check if val is a valid array index.
      */
     function isValidArrayIndex(val) {
-        var n = parseFloat(String(val));        // parseFloat在的参数为数组arr时，会parseFloat(arr[0]),当惨为Symbol时，会报错
+        var n = parseFloat(String(val));        // parseFloat在的参数为数组arr时，会parseFloat(arr[0]),当参数为Symbol时，会报错
         return n >= 0 && Math.floor(n) === n && isFinite(val)       // （n>0)去除NaN、小于0的数字，(Math.floor(n) === n) 去除小数
     }
 
@@ -573,7 +573,7 @@
     var _Set;
     /* istanbul ignore if */ // $flow-disable-line
     if (typeof Set !== 'undefined' && isNative(Set)) {       // 是否有原生Set构造函数
-                                                             // use native Set when available.
+        // use native Set when available.
         _Set = Set;
     } else {
         // a non-standard Set polyfill that only works with primitive keys.
@@ -742,7 +742,7 @@
     Dep.target = null;
     var targetStack = [];
 
-    function pushTarget(_target) {
+    function pushTarget(_target) {      // 修改当前的watcher对象
         if (Dep.target) {
             targetStack.push(Dep.target);
         }
@@ -884,7 +884,7 @@
                 ob.observeArray(inserted);
             }
             // notify change
-            ob.dep.notify();
+            ob.dep.notify();    // 调用变异方法时，触发监听器
             return result
         });
     });
@@ -918,7 +918,7 @@
             var augment = hasProto
                 ? protoAugment
                 : copyAugment;
-            augment(value, arrayMethods, arrayKeys);
+            augment(value, arrayMethods, arrayKeys);    // 将数据变异方法附加到数组的原型上
             this.observeArray(value);
         } else {
             this.walk(value);
@@ -930,7 +930,7 @@
      * getter/setters. This method should only be called when
      * value type is Object.
      */
-    Observer.prototype.walk = function walk(obj) {
+    Observer.prototype.walk = function walk(obj) {      // 遍历对象中的每一项，将其改为getter,setter
         var keys = Object.keys(obj);
         for (var i = 0; i < keys.length; i++) {
             defineReactive(obj, keys[i]);
@@ -952,7 +952,7 @@
      * Augment an target Object or Array by intercepting
      * the prototype chain using __proto__
      */
-    function protoAugment(target, src, keys) {     // 修改target的原型为src
+    function protoAugment(target, src, keys) {     // 复制数组变异方法到数组， 直接覆盖数组target的原型，arrayMethods的原型是Array原型，所以arrayMethods上没有的方法也能再arrayMethods的原型上找到
         /* eslint-disable no-proto */
         target.__proto__ = src;
         /* eslint-enable no-proto */
@@ -964,7 +964,7 @@
      */
 
     /* istanbul ignore next */
-    function copyAugment(target, src, keys) {     // 扶着src的kyes里的方法到target
+    function copyAugment(target, src, keys) {     // 复制数组变异方法到数组，在数组target上定义变异方法
         for (var i = 0, l = keys.length; i < l; i++) {
             var key = keys[i];
             def(target, key, src[key]);
@@ -977,11 +977,11 @@
      * or the existing observer if the value already has one.
      */
     function observe(value, asRootData) {
-        if (!isObject(value) || value instanceof VNode) {   // value不是对象或者是VNode的实例，则返回
+        if (!isObject(value) || value instanceof VNode) {   // value不是对象或者是VNode的实例，直接返回
             return
         }
         var ob;
-        if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+        if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {      // 如果已经有观察对象了，直接返回
             ob = value.__ob__;
         } else if (
             shouldObserve &&
@@ -1001,7 +1001,7 @@
     /**
      * Define a reactive property on an Object.
      */
-    function defineReactive(
+    function defineReactive(        // 将变量定义为响应式getter、setter
         obj,
         key,
         val,
@@ -1016,7 +1016,7 @@
         }
 
         // cater for pre-defined getter/setters
-        var getter = property && property.get;
+        var getter = property && property.get;      // 已经是getter.setter 函数
         var setter = property && property.set;
         if ((!getter || setter) && arguments.length === 2) {
             val = obj[key];
@@ -1029,7 +1029,7 @@
             get: function reactiveGetter() {
                 var value = getter ? getter.call(obj) : val;
                 if (Dep.target) {
-                    dep.depend();
+                    dep.depend();       // 收集依赖到dep.subs
                     if (childOb) {
                         childOb.dep.depend();
                         if (Array.isArray(value)) {
@@ -1055,7 +1055,7 @@
                     val = newVal;
                 }
                 childOb = !shallow && observe(newVal);
-                dep.notify();
+                dep.notify();           // 更新dep.subs
             }
         });
     }
@@ -1065,13 +1065,13 @@
      * triggers change notification if the property doesn't
      * already exist.
      */
-    function set(target, key, val) {
+    function set(target, key, val) {        // 设置一个响应式属性，即vm.$set,Vue.set
         if ("development" !== 'production' &&
-            (isUndef(target) || isPrimitive(target))
+            (isUndef(target) || isPrimitive(target))    // 如果target是null或者原始类型，则告警
         ) {
             warn(("Cannot set reactive property on undefined, null, or primitive value: " + ((target))));
         }
-        if (Array.isArray(target) && isValidArrayIndex(key)) {
+        if (Array.isArray(target) && isValidArrayIndex(key)) {  // target是数组且key是数字索引，直接给数组赋值
             target.length = Math.max(target.length, key);
             target.splice(key, 1, val);
             return val
@@ -1088,11 +1088,11 @@
             );
             return val
         }
-        if (!ob) {
+        if (!ob) {      // 如果target本来没有监听，直接赋值返回
             target[key] = val;
             return val
         }
-        defineReactive(ob.value, key, val);
+        defineReactive(ob.value, key, val);     // 向target上添加新的响应属性
         ob.dep.notify();
         return val
     }
@@ -1100,13 +1100,13 @@
     /**
      * Delete a property and trigger change if necessary.
      */
-    function del(target, key) {
+    function del(target, key) {     // 删除一个响应对象属性，并触发监听，因位getter、setter不能监听到delete操作，即vm.$delete,Vue.delete
         if ("development" !== 'production' &&
             (isUndef(target) || isPrimitive(target))
         ) {
             warn(("Cannot delete reactive property on undefined, null, or primitive value: " + ((target))));
         }
-        if (Array.isArray(target) && isValidArrayIndex(key)) {
+        if (Array.isArray(target) && isValidArrayIndex(key)) {  // 数组直接调用变异方法splice
             target.splice(key, 1);
             return
         }
@@ -1118,21 +1118,21 @@
             );
             return
         }
-        if (!hasOwn(target, key)) {
+        if (!hasOwn(target, key)) {     // 判断要删除的key在不在targte上
             return
         }
-        delete target[key];
-        if (!ob) {
+        delete target[key];     // 删除属性
+        if (!ob) {              // 如果target本来没监听，直接返回
             return
         }
-        ob.dep.notify();
+        ob.dep.notify();        // 触发监听
     }
 
     /**
      * Collect dependencies on array elements when the array is touched, since
      * we cannot intercept array element access like property getters.
      */
-    function dependArray(value) {
+    function dependArray(value) {       // 收集数组子元素依赖
         for (var e = (void 0), i = 0, l = value.length; i < l; i++) {
             e = value[i];
             e && e.__ob__ && e.__ob__.dep.depend();
@@ -2044,29 +2044,29 @@
         seenObjects.clear();
     }
 
-    function _traverse(val, seen) {
+    function _traverse(val, seen) {        // 递归遍历val对象，给子孙属性
         var i, keys;
         var isA = Array.isArray(val);
-        if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
+        if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {     // 如果不是对象和数组，或者是frozen对象，或者是VNode对象，则直接返回
             return
         }
-        if (val.__ob__) {
+        if (val.__ob__) {       // 如果已经有监听对象了
             var depId = val.__ob__.dep.id;
-            if (seen.has(depId)) {
+            if (seen.has(depId)) {      // 如果监听id已存在，直接返回
                 return
             }
-            seen.add(depId);
+            seen.add(depId);    // 将监听id添加到seenObjects
         }
-        if (isA) {
+        if (isA) {              // 如果是数组
             i = val.length;
-            while (i--) {
+            while (i--) {       // 对数组的每个项继进行监听
                 _traverse(val[i], seen);
             }
         } else {
             keys = Object.keys(val);
             i = keys.length;
             while (i--) {
-                _traverse(val[keys[i]], seen);
+                _traverse(val[keys[i]], seen);      // 这里val[keys[i]]，会触发defineReactive中的getter函数，这样就会保存dep.id了
             }
         }
     }
@@ -2520,32 +2520,32 @@
         target = undefined;
     }
 
-    function eventsMixin(Vue) {
+    function eventsMixin(Vue) {     // 定义事件相关方法
         var hookRE = /^hook:/;
-        Vue.prototype.$on = function (event, fn) {
+        Vue.prototype.$on = function (event, fn) {      // 添加事件监听
             var this$1 = this;
 
             var vm = this;
-            if (Array.isArray(event)) {
+            if (Array.isArray(event)) {     // 传入事件数组
                 for (var i = 0, l = event.length; i < l; i++) {
                     this$1.$on(event[i], fn);
                 }
             } else {
-                (vm._events[event] || (vm._events[event] = [])).push(fn);
+                (vm._events[event] || (vm._events[event] = [])).push(fn);   // 将事件加到vm._events中
                 // optimize hook:event cost by using a boolean flag marked at registration
                 // instead of a hash lookup
                 if (hookRE.test(event)) {
                     vm._hasHookEvent = true;
                 }
             }
-            return vm
+            return vm       // 返回vm，方便链式调用
         };
 
-        Vue.prototype.$once = function (event, fn) {
+        Vue.prototype.$once = function (event, fn) {    // 绑定事件，只执行一次
             var vm = this;
 
             function on() {
-                vm.$off(event, on);
+                vm.$off(event, on);     // 触发事件后，调用时先解除事件绑定，再执行绑定的函数
                 fn.apply(vm, arguments);
             }
 
@@ -2554,19 +2554,19 @@
             return vm
         };
 
-        Vue.prototype.$off = function (event, fn) {
+        Vue.prototype.$off = function (event, fn) {     // 解绑事件
             var this$1 = this;
 
             var vm = this;
             // all
-            if (!arguments.length) {
-                vm._events = Object.create(null);
+            if (!arguments.length) {        // 无参数的话，解绑所有事件
+                vm._events = Object.create(null);       // 清空事件列表
                 return vm
             }
             // array of events
-            if (Array.isArray(event)) {
+            if (Array.isArray(event)) {     // 事件列表是数组
                 for (var i = 0, l = event.length; i < l; i++) {
-                    this$1.$off(event[i], fn);
+                    this$1.$off(event[i], fn);      // 解绑数组每个元素
                 }
                 return vm
             }
@@ -2575,7 +2575,7 @@
             if (!cbs) {
                 return vm
             }
-            if (!fn) {
+            if (!fn) {      // 如果没传第二个参数fn，则清空这个事件下所有回调函数
                 vm._events[event] = null;
                 return vm
             }
@@ -2585,7 +2585,7 @@
                 var i$1 = cbs.length;
                 while (i$1--) {
                     cb = cbs[i$1];
-                    if (cb === fn || cb.fn === fn) {
+                    if (cb === fn || cb.fn === fn) {        // 找到对应的fn，从vm._events[event]中删除这个回调函数
                         cbs.splice(i$1, 1);
                         break
                     }
@@ -2598,7 +2598,7 @@
             var vm = this;
             {
                 var lowerCaseEvent = event.toLowerCase();
-                if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
+                if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {       // 提示HTML中大小写不敏感，注册事件名不能有大写
                     tip(
                         "Event \"" + lowerCaseEvent + "\" is emitted in component " +
                         (formatComponentName(vm)) + " but the handler is registered for \"" + event + "\". " +
@@ -2611,8 +2611,8 @@
             var cbs = vm._events[event];
             if (cbs) {
                 cbs = cbs.length > 1 ? toArray(cbs) : cbs;
-                var args = toArray(arguments, 1);
-                for (var i = 0, l = cbs.length; i < l; i++) {
+                var args = toArray(arguments, 1);       // 得到触发事件时的传参
+                for (var i = 0, l = cbs.length; i < l; i++) {   // 调用事件的每个回调函数，都传参args
                     try {
                         cbs[i].apply(vm, args);
                     } catch (e) {
@@ -2720,7 +2720,7 @@
         vm._isBeingDestroyed = false;
     }
 
-    function lifecycleMixin(Vue) {
+    function lifecycleMixin(Vue) {      //  定义几个控制生命周期的函数
         Vue.prototype._update = function (vnode, hydrating) {
             var vm = this;
             var prevEl = vm.$el;
@@ -2753,32 +2753,32 @@
             // updated in a parent's updated hook.
         };
 
-        Vue.prototype.$forceUpdate = function () {
+        Vue.prototype.$forceUpdate = function () {      // 强制实例重新渲染
             var vm = this;
             if (vm._watcher) {
                 vm._watcher.update();
             }
         };
 
-        Vue.prototype.$destroy = function () {
+        Vue.prototype.$destroy = function () {      // 销毁实例
             var vm = this;
-            if (vm._isBeingDestroyed) {
+            if (vm._isBeingDestroyed) {             // 是否真正销毁组件
                 return
             }
-            callHook(vm, 'beforeDestroy');
+            callHook(vm, 'beforeDestroy');          // 触发beforeDestroy事件
             vm._isBeingDestroyed = true;
             // remove self from parent
             var parent = vm.$parent;
             if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
-                remove(parent.$children, vm);
+                remove(parent.$children, vm);       // 从父组件的.$children中移除
             }
             // teardown watchers
-            if (vm._watcher) {
+            if (vm._watcher) {      // 如果有监听，将其销毁
                 vm._watcher.teardown();
             }
             var i = vm._watchers.length;
             while (i--) {
-                vm._watchers[i].teardown();
+                vm._watchers[i].teardown();     //  将所有监听销毁
             }
             // remove reference from data ob
             // frozen object may not have observer.
@@ -2790,9 +2790,9 @@
             // invoke destroy hooks on current rendered tree
             vm.__patch__(vm._vnode, null);
             // fire destroyed hook
-            callHook(vm, 'destroyed');
+            callHook(vm, 'destroyed');      // 触发钩子destroyed
             // turn off all instance listeners.
-            vm.$off();
+            vm.$off();      // 销毁所有事件
             // remove __vue__ reference
             if (vm.$el) {
                 vm.$el.__vue__ = null;
@@ -3128,11 +3128,11 @@
      * Jobs with duplicate IDs will be skipped unless it's
      * pushed when the queue is being flushed.
      */
-    function queueWatcher(watcher) {
+    function queueWatcher(watcher) {    // 将watcher加到更新队列中
         var id = watcher.id;
-        if (has[id] == null) {
+        if (has[id] == null) {      // 判断是否已经在队列中
             has[id] = true;
-            if (!flushing) {
+            if (!flushing) {        // 是否真正更新
                 queue.push(watcher);
             } else {
                 // if already flushing, splice the watcher based on its id
@@ -3195,7 +3195,7 @@
         if (typeof expOrFn === 'function') {
             this.getter = expOrFn;
         } else {
-            this.getter = parsePath(expOrFn);
+            this.getter = parsePath(expOrFn);   // this.getter调用时第一个参数是vm对象
             if (!this.getter) {
                 this.getter = function () {
                 };
@@ -3219,11 +3219,11 @@
      * Evaluate the getter, and re-collect dependencies.
      */
     Watcher.prototype.get = function get() {
-        pushTarget(this);
+        pushTarget(this);       // 修改Dep.target为当前watcher对象
         var value;
         var vm = this.vm;
         try {
-            value = this.getter.call(vm, vm);
+            value = this.getter.call(vm, vm);   // 获取当前监听数据的值
         } catch (e) {
             if (this.user) {
                 handleError(e, vm, ("getter for watcher \"" + (this.expression) + "\""));
@@ -3233,10 +3233,10 @@
         } finally {
             // "touch" every property so they are all tracked as
             // dependencies for deep watching
-            if (this.deep) {
+            if (this.deep) {        // 如果是deep监听，则递归遍历value下的每个值
                 traverse(value);
             }
-            popTarget();
+            popTarget();            //修改Dep.target为上个watcher对象
             this.cleanupDeps();
         }
         return value
@@ -3245,7 +3245,7 @@
     /**
      * Add a dependency to this directive.
      */
-    Watcher.prototype.addDep = function addDep(dep) {
+    Watcher.prototype.addDep = function addDep(dep) {   // 将watcher添加到dep.subs中
         var id = dep.id;
         if (!this.newDepIds.has(id)) {
             this.newDepIds.add(id);
@@ -3283,7 +3283,7 @@
      * Subscriber interface.
      * Will be called when a dependency changes.
      */
-    Watcher.prototype.update = function update() {
+    Watcher.prototype.update = function update() {  // 更新监听
         var this$1 = this;
 
         /* istanbul ignore else */
@@ -3481,7 +3481,7 @@
 
     function initData(vm) {     // 初始化处理data
         var data = vm.$options.data;
-        data = vm._data = typeof data === 'function'    // data可以是函数或者对象
+        data = vm._data = typeof data === 'function'    // data可以是函数或者对象，将data赋值给vm._data
             ? getData(data, vm)
             : data || {};
         if (!isPlainObject(data)) {     // data为函数时必须返回对象
@@ -3537,7 +3537,7 @@
     var computedWatcherOptions = {computed: true};
 
     function initComputed(vm, computed) {       // 初始化处理computed
-        // $flow-disable-line
+                                                // $flow-disable-line
         var watchers = vm._computedWatchers = Object.create(null);
         // computed properties are just getters during SSR
         var isSSR = isServerRendering();
@@ -3677,7 +3677,7 @@
         return vm.$watch(expOrFn, handler, options)
     }
 
-    function stateMixin(Vue) {
+    function stateMixin(Vue) {      // 设置代理，定义vm.$watch
         // flow somehow has problems with directly declared definition object
         // when using Object.defineProperty, so we have to procedurally build up
         // the object here.
@@ -3690,7 +3690,7 @@
             return this._props
         };
         {
-            dataDef.set = function (newData) {
+            dataDef.set = function (newData) {      // 设置$data,$props时报警
                 warn(
                     'Avoid replacing instance root $data. ' +
                     'Use nested data properties instead.',
@@ -3701,11 +3701,11 @@
                 warn("$props is readonly.", this);
             };
         }
-        Object.defineProperty(Vue.prototype, '$data', dataDef);
-        Object.defineProperty(Vue.prototype, '$props', propsDef);
+        Object.defineProperty(Vue.prototype, '$data', dataDef);     // 定义$data,代理_data
+        Object.defineProperty(Vue.prototype, '$props', propsDef);   // 定义$props,代理_props
 
-        Vue.prototype.$set = set;
-        Vue.prototype.$delete = del;
+        Vue.prototype.$set = set;           // 定义$set
+        Vue.prototype.$delete = del;        // 定义$delete
 
         Vue.prototype.$watch = function (       // 创建监听
             expOrFn,
@@ -3730,7 +3730,7 @@
 
     /*  */
 
-    function initProvide(vm) {
+    function initProvide(vm) {      // 将provide对象加到vm._provided
         var provide = vm.$options.provide;
         if (provide) {
             vm._provided = typeof provide === 'function'
@@ -4632,7 +4632,7 @@
         }
     }
 
-    function renderMixin(Vue) {
+    function renderMixin(Vue) {     // 定义
         // install runtime convenience helpers
         installRenderHelpers(Vue.prototype);
 
@@ -4704,7 +4704,7 @@
 
     var uid$3 = 0;
 
-    function initMixin(Vue) {
+    function initMixin(Vue) {       // 定义初始化函数vm._init
         Vue.prototype._init = function (options) {
             var vm = this;
             // a uid
@@ -11170,7 +11170,7 @@
     });
 
     var mount = Vue.prototype.$mount;
-    Vue.prototype.$mount = function (       // 重新写prototype.$mount
+    Vue.prototype.$mount = function (       // 重写prototype.$mount
         el,
         hydrating
     ) {
