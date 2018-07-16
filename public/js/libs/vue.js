@@ -270,7 +270,7 @@
     /**
      * Always return false.
      */
-    var no = function (a, b, c) {
+    var no = function (a, b, c) {   // 总是返回false
         return false;
     };
 
@@ -5380,7 +5380,7 @@
         return isHTMLTag(tag) || isSVG(tag)
     };
 
-    function getTagNamespace(tag) {
+    function getTagNamespace(tag) {     // 获取标签的命名空间
         if (isSVG(tag)) {
             return 'svg'
         }
@@ -6737,11 +6737,11 @@
 
     /*  */
 
-    function baseWarn(msg) {
+    function baseWarn(msg) {        // 默认编译报错函数
         console.error(("[Vue compiler]: " + msg));
     }
 
-    function pluckModuleFunction(
+    function pluckModuleFunction(   // 从modules数组中拉出所有符合key的项，用数组返回
         modules,
         key
     ) {
@@ -8964,7 +8964,7 @@
 
     /*  */
 
-    var isUnaryTag = makeMap(
+    var isUnaryTag = makeMap(       // 判断是否为可以自闭合的标签
         'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
         'link,meta,param,source,track,wbr'
     );
@@ -8977,7 +8977,7 @@
 
 // HTML5 tags https://html.spec.whatwg.org/multipage/indices.html#elements-3
 // Phrasing Content https://html.spec.whatwg.org/multipage/dom.html#phrasing-content
-    var isNonPhrasingTag = makeMap(
+    var isNonPhrasingTag = makeMap(     // 判断是否为html标签
         'address,article,aside,base,blockquote,body,caption,col,colgroup,dd,' +
         'details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
         'h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,' +
@@ -8997,18 +8997,18 @@
  */
 
 // Regular Expressions for parsing tags and attributes
-    var attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/;
+    var attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/;    // 匹配写在开始标签里的属性
 // could use https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
 // but for Vue templates we can enforce a simple charset
     var ncname = '[a-zA-Z_][\\w\\-\\.]*';
     var qnameCapture = "((?:" + ncname + "\\:)?" + ncname + ")";
-    var startTagOpen = new RegExp(("^<" + qnameCapture));
-    var startTagClose = /^\s*(\/?)>/;
+    var startTagOpen = new RegExp(("^<" + qnameCapture));       // 开始标签
+    var startTagClose = /^\s*(\/?)>/;                           // 开始标签的闭合位置
     var endTag = new RegExp(("^<\\/" + qnameCapture + "[^>]*>"));
-    var doctype = /^<!DOCTYPE [^>]+>/i;
+    var doctype = /^<!DOCTYPE [^>]+>/i;     // 匹配<!DOCTYPE
 // #7298: escape - to avoid being pased as HTML comment when inlined in page
-    var comment = /^<!\--/;
-    var conditionalComment = /^<!\[/;
+    var comment = /^<!\--/;                 // 匹配html注释
+    var conditionalComment = /^<!\[/;       // 匹配<![]>这种代码，不支持javascript脚本的浏览器中，显示为注释
 
     var IS_REGEX_CAPTURING_BROKEN = false;
     'x'.replace(/x(.)?/g, function (m, g) {
@@ -9019,7 +9019,7 @@
     var isPlainTextElement = makeMap('script,style,textarea', true);
     var reCache = {};
 
-    var decodingMap = {
+    var decodingMap = {     // html转义字符
         '&lt;': '<',
         '&gt;': '>',
         '&quot;': '"',
@@ -9057,7 +9057,7 @@
                 var textEnd = html.indexOf('<');
                 if (textEnd === 0) {
                     // Comment:
-                    if (comment.test(html)) {
+                    if (comment.test(html)) {       //  是否为注释
                         var commentEnd = html.indexOf('-->');
 
                         if (commentEnd >= 0) {
@@ -9171,22 +9171,22 @@
         // Clean up any remaining tags
         parseEndTag();
 
-        function advance(n) {
+        function advance(n) {       // 截取html片段的第n位到最后
             index += n;
             html = html.substring(n);
         }
 
-        function parseStartTag() {
-            var start = html.match(startTagOpen);
+        function parseStartTag() {      // 处理开始标签
+            var start = html.match(startTagOpen);   // 匹配开始标签
             if (start) {
                 var match = {
-                    tagName: start[1],
+                    tagName: start[1],  // 开始标签的名字
                     attrs: [],
-                    start: index
+                    start: index        // 开始标签在原始html字符串中的位置
                 };
                 advance(start[0].length);
                 var end, attr;
-                while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+                while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {      // 匹配到开始标签的结束标签或者开始标签没有属性了，跳出循环
                     advance(attr[0].length);
                     match.attrs.push(attr);
                 }
@@ -9199,7 +9199,7 @@
             }
         }
 
-        function handleStartTag(match) {
+        function handleStartTag(match) {    // 处理开始标签经过parseStartTag处理的匹配结果
             var tagName = match.tagName;
             var unarySlash = match.unarySlash;
 
@@ -9231,17 +9231,17 @@
                     }
                 }
                 var value = args[3] || args[4] || args[5] || '';
-                var shouldDecodeNewlines = tagName === 'a' && args[1] === 'href'
+                var shouldDecodeNewlines = tagName === 'a' && args[1] === 'href'    //
                     ? options.shouldDecodeNewlinesForHref
                     : options.shouldDecodeNewlines;
-                attrs[i] = {
+                attrs[i] = {        // 得到属性名与值
                     name: args[1],
                     value: decodeAttr(value, shouldDecodeNewlines)
                 };
             }
 
             if (!unary) {
-                stack.push({tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrs});
+                stack.push({tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrs});     // 把解析出来的标签放到stack中
                 lastTag = tagName;
             }
 
@@ -9334,7 +9334,7 @@
     var platformGetTagNamespace;
 
 
-    function createASTElement(
+    function createASTElement(      // 创建AST元素
         tag,
         attrs,
         parent
@@ -9412,11 +9412,11 @@
 
                 // handle IE svg bug
                 /* istanbul ignore if */
-                if (isIE && ns === 'svg') {
+                if (isIE && ns === 'svg') {     // 处理IE下的svg标签bug
                     attrs = guardIESVGBug(attrs);
                 }
 
-                var element = createASTElement(tag, attrs, currentParent);
+                var element = createASTElement(tag, attrs, currentParent);      // 生成AST元素
                 if (ns) {
                     element.ns = ns;
                 }
@@ -9904,14 +9904,14 @@
         }
     }
 
-    function makeAttrsMap(attrs) {
+    function makeAttrsMap(attrs) {      // 创建属性map
         var map = {};
         for (var i = 0, l = attrs.length; i < l; i++) {
             if (
                 "development" !== 'production' &&
                 map[attrs[i].name] && !isIE && !isEdge
             ) {
-                warn$2('duplicate attribute: ' + attrs[i].name);
+                warn$2('duplicate attribute: ' + attrs[i].name);        // 属性已存在且非IE、Edge时报警
             }
             map[attrs[i].name] = attrs[i].value;
         }
@@ -9923,7 +9923,7 @@
         return el.tag === 'script' || el.tag === 'style'
     }
 
-    function isForbiddenTag(el) {
+    function isForbiddenTag(el) {       // 判断是否为禁止的AST标签
         return (
             el.tag === 'style' ||
             (el.tag === 'script' && (
@@ -9978,7 +9978,7 @@
      */
 
     function preTransformNode(el, options) {
-        if (el.tag === 'input') {
+        if (el.tag === 'input') {       // 只处理input标签
             var map = el.attrsMap;
             if (!map['v-model']) {
                 return
@@ -10978,22 +10978,22 @@
         }
     }
 
-    function createCompileToFunctionFn(compile) {
-        var cache = Object.create(null);
+    function createCompileToFunctionFn(compile) {   // 返回编译函数，并在编译后缓存
+        var cache = Object.create(null);            // 缓存列表，对象的key是编译的模板字符串
 
-        return function compileToFunctions(
+        return function compileToFunctions(         // 编译函数
             template,
             options,
             vm
         ) {
             options = extend({}, options);
             var warn$$1 = options.warn || warn;
-            delete options.warn;
+            delete options.warn;        // 删除options.warn在createCompiler中会合并options
 
             /* istanbul ignore if */
             {
                 // detect possible CSP restriction
-                try {
+                try {       // 判断是否支持CSP机制，支持的话会报错
                     new Function('return 1');
                 } catch (e) {
                     if (e.toString().match(/unsafe-eval|CSP/)) {
@@ -11070,8 +11070,8 @@
 
     /*  */
 
-    function createCompilerCreator(baseCompile) {
-        return function createCompiler(baseOptions) {
+    function createCompilerCreator(baseCompile) {       // 返回生成编译函数的函数
+        return function createCompiler(baseOptions) {   // 返回编译函数
             function compile(
                 template,
                 options
@@ -11079,7 +11079,7 @@
                 var finalOptions = Object.create(baseOptions);
                 var errors = [];
                 var tips = [];
-                finalOptions.warn = function (msg, tip) {
+                finalOptions.warn = function (msg, tip) {   // 定义自己的warn函数
                     (tip ? tips : errors).push(msg);
                 };
 
@@ -11097,14 +11097,14 @@
                         );
                     }
                     // copy other options
-                    for (var key in options) {
+                    for (var key in options) {      // 合并options
                         if (key !== 'modules' && key !== 'directives') {
                             finalOptions[key] = options[key];
                         }
                     }
                 }
 
-                var compiled = baseCompile(template, finalOptions);
+                var compiled = baseCompile(template, finalOptions);     // 调用基本编译函数
                 {
                     errors.push.apply(errors, detectErrors(compiled.ast));
                 }
@@ -11125,7 +11125,7 @@
 // `createCompilerCreator` allows creating compilers that use alternative
 // parser/optimizer/codegen, e.g the SSR optimizing compiler.
 // Here we just export a default compiler using the default parts.
-    var createCompiler = createCompilerCreator(function baseCompile(
+    var createCompiler = createCompilerCreator(function baseCompile(    // 生成编译函数的函数
         template,
         options
     ) {
@@ -11153,14 +11153,14 @@
 
     function getShouldDecode(href) {
         div = div || document.createElement('div');
-        div.innerHTML = href ? "<a href=\"\n\"/>" : "<div a=\"\n\"/>";
+        div.innerHTML = href ? "<a href=\"\n\"/>" : "<div a=\"\n\"/>";      // a标签的href属性在IE和Chrome中都会转义，其他标签的属性只在IE中会转义
         return div.innerHTML.indexOf('&#10;') > 0
     }
 
 // #3663: IE encodes newlines inside attribute values while other browsers don't
-    var shouldDecodeNewlines = inBrowser ? getShouldDecode(false) : false;
+    var shouldDecodeNewlines = inBrowser ? getShouldDecode(false) : false;          // 除a标签外的其他标签的属性在IE中需要解码
 // #6828: chrome encodes content in a[href]
-    var shouldDecodeNewlinesForHref = inBrowser ? getShouldDecode(true) : false;
+    var shouldDecodeNewlinesForHref = inBrowser ? getShouldDecode(true) : false;    // a标签的href属性需要解码
 
     /*  */
 
