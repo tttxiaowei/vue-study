@@ -8958,7 +8958,7 @@
         decode: function decode(html) {
             decoder = decoder || document.createElement('div');
             decoder.innerHTML = html;
-            return decoder.textContent
+            return decoder.textContent          // textContent：元素及其子孙节点的文本
         }
     }
 
@@ -9050,7 +9050,7 @@
         var canBeLeftOpenTag$$1 = options.canBeLeftOpenTag || no;
         var index = 0;
         var last, lastTag;
-        while (html) {
+        while (html) {      // 遍历html字符串，生成节点
             last = html;
             // Make sure we're not in a plaintext content element like script/style
             if (!lastTag || !isPlainTextElement(lastTag)) {
