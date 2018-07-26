@@ -9044,7 +9044,7 @@
     }
 
     function parseHTML(html, options) {
-        var stack = [];
+        var stack = [];                 // 局部stackj
         var expectHTML = options.expectHTML;
         var isUnaryTag$$1 = options.isUnaryTag || no;
         var canBeLeftOpenTag$$1 = options.canBeLeftOpenTag || no;
@@ -9250,7 +9250,7 @@
             }
         }
 
-        function parseEndTag(tagName, start, end) {
+        function parseEndTag(tagName, start, end) {     // 处理结束标签
             var pos, lowerCasedTagName;
             if (start == null) {
                 start = index;
@@ -9265,7 +9265,7 @@
 
             // Find the closest opened tag of the same type
             if (tagName) {
-                for (pos = stack.length - 1; pos >= 0; pos--) {
+                for (pos = stack.length - 1; pos >= 0; pos--) {     // 从后往前找出结束标签在stack中最近的位置
                     if (stack[pos].lowerCasedTag === lowerCasedTagName) {
                         break
                     }
@@ -9275,7 +9275,7 @@
                 pos = 0;
             }
 
-            if (pos >= 0) {
+            if (pos >= 0) {     // 结束标签在stack中
                 // Close all the open elements, up the stack
                 for (var i = stack.length - 1; i >= pos; i--) {
                     if ("development" !== 'production' &&
@@ -9368,7 +9368,7 @@
 
         delimiters = options.delimiters;
 
-        var stack = [];
+        var stack = [];     // 本次解析html的stack
         var preserveWhitespace = options.preserveWhitespace !== false;
         var root;
         var currentParent;
@@ -9405,7 +9405,7 @@
             shouldDecodeNewlines: options.shouldDecodeNewlines,
             shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
             shouldKeepComment: options.comments,
-            start: function start(tag, attrs, unary) {
+            start: function start(tag, attrs, unary) {      // 处理开始标签
                 // check namespace.
                 // inherit parent ns if there is one
                 var ns = (currentParent && currentParent.ns) || platformGetTagNamespace(tag);
@@ -9512,7 +9512,7 @@
                 }
             },
 
-            end: function end() {
+            end: function end() {       // 处理结束标签
                 // remove trailing whitespace
                 var element = stack[stack.length - 1];
                 var lastNode = element.children[element.children.length - 1];
@@ -9520,9 +9520,9 @@
                     element.children.pop();
                 }
                 // pop stack
-                stack.length -= 1;
+                stack.length -= 1;      // 将stack中最后一个元素去掉
                 currentParent = stack[stack.length - 1];
-                closeElement(element);
+                closeElement(element);      // 克隆stack中最后一个元素
             },
 
             chars: function chars(text) {
@@ -10189,7 +10189,7 @@
         }
     }
 
-    function isStatic(node) {
+    function isStatic(node) {       // 判断是否为静态节点
         if (node.type === 2) { // expression
             return false
         }
@@ -11129,9 +11129,9 @@
         template,
         options
     ) {
-        var ast = parse(template.trim(), options);
+        var ast = parse(template.trim(), options);      // 解析html模板为ast节点
         if (options.optimize !== false) {
-            optimize(ast, options);
+            optimize(ast, options);             // 遍历ast节点
         }
         var code = generate(ast, options);
         return {
