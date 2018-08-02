@@ -2088,7 +2088,7 @@
         }
     });
 
-    function createFnInvoker(fns) {
+    function createFnInvoker(fns) {     // 创建函数调用者
         function invoker() {
             var arguments$1 = arguments;
 
@@ -2721,7 +2721,7 @@
     }
 
     function lifecycleMixin(Vue) {      //  定义几个控制生命周期的函数
-        Vue.prototype._update = function (vnode, hydrating) {
+        Vue.prototype._update = function (vnode, hydrating) {       // 更新dom
             var vm = this;
             var prevEl = vm.$el;
             var prevVnode = vm._vnode;
@@ -4059,7 +4059,7 @@
 
     /*  */
 
-    function installRenderHelpers(target) {
+    function installRenderHelpers(target) {     // 定义运行时render函数
         target._o = markOnce;
         target._n = toNumber;
         target._s = toString;
@@ -4634,13 +4634,13 @@
 
     function renderMixin(Vue) {     // 定义
         // install runtime convenience helpers
-        installRenderHelpers(Vue.prototype);
+        installRenderHelpers(Vue.prototype);    // 将运行时函数定义到Vue原型上
 
         Vue.prototype.$nextTick = function (fn) {
             return nextTick(fn, this)
         };
 
-        Vue.prototype._render = function () {
+        Vue.prototype._render = function () {   // 将vm对象render为VNode对象
             var vm = this;
             var ref = vm.$options;
             var render = ref.render;
@@ -4664,7 +4664,7 @@
             // render self
             var vnode;
             try {
-                vnode = render.call(vm._renderProxy, vm.$createElement);
+                vnode = render.call(vm._renderProxy, vm.$createElement);    // 将本节点render为VNode
             } catch (e) {
                 handleError(e, vm, "render");
                 // return error render result,
@@ -5442,28 +5442,28 @@
 
     /*  */
 
-    function createElement$1(tagName, vnode) {
+    function createElement$1(tagName, vnode) {      // 创建dom元素
         var elm = document.createElement(tagName);
         if (tagName !== 'select') {
             return elm
         }
         // false or null will remove the attribute but undefined will not
-        if (vnode.data && vnode.data.attrs && vnode.data.attrs.multiple !== undefined) {
+        if (vnode.data && vnode.data.attrs && vnode.data.attrs.multiple !== undefined) {    // 处理select元素的multiple属性
             elm.setAttribute('multiple', 'multiple');
         }
         return elm
     }
 
     function createElementNS(namespace, tagName) {
-        return document.createElementNS(namespaceMap[namespace], tagName)
+        return document.createElementNS(namespaceMap[namespace], tagName)   // 创建一个具有指定的命名空间URI和限定名称的元素，这里针对svg和math
     }
 
     function createTextNode(text) {
-        return document.createTextNode(text)
+        return document.createTextNode(text)        // 创建一个文本节点
     }
 
     function createComment(text) {
-        return document.createComment(text)
+        return document.createComment(text)         // 创建一个注释节点
     }
 
     function insertBefore(parentNode, newNode, referenceNode) {
@@ -5622,7 +5622,7 @@
         var modules = backend.modules;
         var nodeOps = backend.nodeOps;
 
-        for (i = 0; i < hooks.length; ++i) {
+        for (i = 0; i < hooks.length; ++i) {        // 针对
             cbs[hooks[i]] = [];
             for (j = 0; j < modules.length; ++j) {
                 if (isDef(modules[j][hooks[i]])) {
@@ -5631,7 +5631,7 @@
             }
         }
 
-        function emptyNodeAt(elm) {
+        function emptyNodeAt(elm) {     // 封装dom对象为VNode节点
             return new VNode(nodeOps.tagName(elm).toLowerCase(), {}, [], undefined, elm)
         }
 
@@ -5672,7 +5672,7 @@
 
         var creatingElmInVPre = 0;
 
-        function createElm(
+        function createElm(     // 由vnode创建dom元素并插入
             vnode,
             insertedVnodeQueue,
             parentElm,
@@ -5801,7 +5801,7 @@
             insert(parentElm, vnode.elm, refElm);
         }
 
-        function insert(parent, elm, ref$$1) {
+        function insert(parent, elm, ref$$1) {      // 向页面插入dom元素
             if (isDef(parent)) {
                 if (isDef(ref$$1)) {
                     if (ref$$1.parentNode === parent) {
@@ -5813,7 +5813,7 @@
             }
         }
 
-        function createChildren(vnode, children, insertedVnodeQueue) {
+        function createChildren(vnode, children, insertedVnodeQueue) {      //
             if (Array.isArray(children)) {
                 {
                     checkDuplicateKeys(children);
@@ -5833,7 +5833,7 @@
             return isDef(vnode.tag)
         }
 
-        function invokeCreateHooks(vnode, insertedVnodeQueue) {
+        function invokeCreateHooks(vnode, insertedVnodeQueue) {     // 初始化vnode，绑定事件之类
             for (var i$1 = 0; i$1 < cbs.create.length; ++i$1) {
                 cbs.create[i$1](emptyNode, vnode);
             }
@@ -6015,7 +6015,7 @@
             }
         }
 
-        function checkDuplicateKeys(children) {
+        function checkDuplicateKeys(children) {     // 检查子节点数组，如果定义了key，key属性是否重复
             var seenKeys = {};
             for (var i = 0; i < children.length; i++) {
                 var vnode = children[i];
@@ -6240,7 +6240,7 @@
             }
         }
 
-        return function patch(oldVnode, vnode, hydrating, removeOnly) {
+        return function patch(oldVnode, vnode, hydrating, removeOnly) {     // 修改DOM节点
             if (isUndef(vnode)) {
                 if (isDef(oldVnode)) {
                     invokeDestroyHook(oldVnode);
@@ -6251,13 +6251,13 @@
             var isInitialPatch = false;
             var insertedVnodeQueue = [];
 
-            if (isUndef(oldVnode)) {
+            if (isUndef(oldVnode)) {    // 如果没有旧节点
                 // empty mount (likely as component), create new root element
                 isInitialPatch = true;
                 createElm(vnode, insertedVnodeQueue);
             } else {
-                var isRealElement = isDef(oldVnode.nodeType);
-                if (!isRealElement && sameVnode(oldVnode, vnode)) {
+                var isRealElement = isDef(oldVnode.nodeType);   // 旧节点是dom元素
+                if (!isRealElement && sameVnode(oldVnode, vnode)) {     // 旧元素非真实dom元素， 且新旧节点是同一个vnode
                     // patch existing root node
                     patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly);
                 } else {
@@ -6265,7 +6265,7 @@
                         // mounting to a real element
                         // check if this is server-rendered content and if we can perform
                         // a successful hydration.
-                        if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
+                        if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {   // 服务器端渲染
                             oldVnode.removeAttribute(SSR_ATTR);
                             hydrating = true;
                         }
@@ -6285,7 +6285,7 @@
                         }
                         // either not server-rendered, or hydration failed.
                         // create an empty node and replace it
-                        oldVnode = emptyNodeAt(oldVnode);
+                        oldVnode = emptyNodeAt(oldVnode);   // 将旧dom元素转为vnode
                     }
 
                     // replacing existing element
@@ -6335,7 +6335,7 @@
 
                     // destroy old node
                     if (isDef(parentElm)) {
-                        removeVnodes(parentElm, [oldVnode], 0, 0);
+                        removeVnodes(parentElm, [oldVnode], 0, 0);      // 删除旧节点
                     } else if (isDef(oldVnode.tag)) {
                         invokeDestroyHook(oldVnode);
                     }
@@ -7264,7 +7264,7 @@
         }
     }
 
-    function add$1(
+    function add$1(     // 绑定事件
         event,
         handler,
         once$$1,
@@ -8889,7 +8889,7 @@
         }
     }
 
-    function genData(el) {
+    function genData(el) {      // 处理绑定class
         var data = '';
         if (el.staticClass) {
             data += "staticClass:" + (el.staticClass) + ",";
@@ -8933,7 +8933,7 @@
         }
     }
 
-    function genData$1(el) {
+    function genData$1(el) {        // 处理绑定style
         var data = '';
         if (el.staticStyle) {
             data += "staticStyle:" + (el.staticStyle) + ",";
@@ -10272,7 +10272,7 @@
         right: genGuard("'button' in $event && $event.button !== 2")
     };
 
-    function genHandlers(
+    function genHandlers(       // 拼接绑定的事件字符串
         events,
         isNative,
         warn
@@ -10284,15 +10284,15 @@
         return res.slice(0, -1) + '}'
     }
 
-    function genHandler(
+    function genHandler(    // 获取函数字符串
         name,
         handler
     ) {
-        if (!handler) {
+        if (!handler) {     //  没有处理函数，返回空函数字符串
             return 'function(){}'
         }
 
-        if (Array.isArray(handler)) {
+        if (Array.isArray(handler)) {   // 如果是数组，遍历其每一项，将转换为函数字符串
             return ("[" + (handler.map(function (handler) {
                 return genHandler(name, handler);
             }).join(',')) + "]")
@@ -10563,7 +10563,7 @@
             '})'
     }
 
-    function genData$2(el, state) {
+    function genData$2(el, state) {     // 拼接元素的绑定的属性
         var data = '{';
 
         // directives first.
@@ -10841,7 +10841,7 @@
         return ("_c(" + componentName + "," + (genData$2(el, state)) + (children ? ("," + children) : '') + ")")
     }
 
-    function genProps(props) {
+    function genProps(props) {      // 拼接绑定的属性字符串
         var res = '';
         for (var i = 0; i < props.length; i++) {
             var prop = props[i];
@@ -10854,7 +10854,7 @@
     }
 
 // #3895, #4268
-    function transformSpecialNewlines(text) {
+    function transformSpecialNewlines(text) {       //  由于字符串表达式中是不允许换行， 将特殊字符转义(\u2028行分隔符，\u2029段落分隔符)
         return text
             .replace(/\u2028/g, '\\u2028')
             .replace(/\u2029/g, '\\u2029')
@@ -10969,7 +10969,7 @@
 
     /*  */
 
-    function createFunction(code, errors) {
+    function createFunction(code, errors) {     // 根据字符串code创建函数
         try {
             return new Function(code)
         } catch (err) {
