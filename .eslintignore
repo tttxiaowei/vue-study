@@ -1,0 +1,10 @@
+﻿##过滤文件
+.idea
+.vscode
+.happypacks
+/node_modules
+/public/libs/*
+npm-debug.log
+package-lock.json
+**/.DS_Store
+**/*.d.ts
