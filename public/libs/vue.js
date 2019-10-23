@@ -35,7 +35,7 @@
     /**
      * Check if value is primitive.
      */
-    function isPrimitive(value) {
+    function isPrimitive(value) {       // 判断value是否为原始类型
         return (
             typeof value === 'string' ||
             typeof value === 'number' ||
@@ -67,7 +67,7 @@
      * Strict object type check. Only returns true
      * for plain JavaScript objects.
      */
-    function isPlainObject(obj) {
+    function isPlainObject(obj) {   // 是纯对象
         return _toString.call(obj) === '[object Object]'
     }
 
@@ -78,12 +78,12 @@
     /**
      * Check if val is a valid array index.
      */
-    function isValidArrayIndex(val) {
+    function isValidArrayIndex(val) {   // 检查是否为合法的数组索引
         var n = parseFloat(String(val));
         return n >= 0 && Math.floor(n) === n && isFinite(val)
     }
 
-    function isPromise(val) {
+    function isPromise(val) {   // 是否为Promise
         return (
             isDef(val) &&
             typeof val.then === 'function' &&
@@ -141,7 +141,7 @@
     /**
      * Check if an attribute is a reserved attribute.
      */
-    var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');
+    var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');    // vue内置标签属性名
 
     /**
      * Remove an item from an array.
@@ -160,7 +160,7 @@
      */
     var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-    function hasOwn(obj, key) {
+    function hasOwn(obj, key) {     // 判断对象自身是否有某个属性
         return hasOwnProperty.call(obj, key)
     }
 
@@ -196,7 +196,7 @@
      * Hyphenate a camelCase string.
      */
     var hyphenateRE = /\B([A-Z])/g;
-    var hyphenate = cached(function (str) {
+    var hyphenate = cached(function (str) {     // 将驼峰改成-连接的变量
         return str.replace(hyphenateRE, '-$1').toLowerCase()
     });
 
@@ -209,7 +209,7 @@
      */
 
     /* istanbul ignore next */
-    function polyfillBind(fn, ctx) {
+    function polyfillBind(fn, ctx) {    // 兼容bind
         function boundFn(a) {
             var l = arguments.length;
             return l
@@ -223,7 +223,7 @@
         return boundFn
     }
 
-    function nativeBind(fn, ctx) {
+    function nativeBind(fn, ctx) {      // 原生bind
         return fn.bind(ctx)
     }
 
@@ -247,7 +247,7 @@
     /**
      * Mix properties into target object.
      */
-    function extend(to, _from) {
+    function extend(to, _from) {    // 将_from的属性都拷贝到to上
         for (var key in _from) {
             to[key] = _from[key];
         }
@@ -502,7 +502,7 @@
     /**
      * Check if a string starts with $ or _
      */
-    function isReserved(str) {
+    function isReserved(str) {      // 以$, _开头变量名上vue保留的
         var c = (str + '').charCodeAt(0);
         return c === 0x24 || c === 0x5F
     }
@@ -560,7 +560,7 @@
     var isFF = UA && UA.match(/firefox\/(\d+)/);
 
     // Firefox has a "watch" function on Object.prototype...
-    var nativeWatch = ({}).watch;
+    var nativeWatch = ({}).watch;   // Firefox的Object.prototype上有watch函数
 
     var supportsPassive = false;
     if (inBrowser) {
@@ -598,11 +598,11 @@
     var devtools = inBrowser && window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
 
     /* istanbul ignore next */
-    function isNative(Ctor) {
+    function isNative(Ctor) {   // 判断js引擎是否支持某个原生函数
         return typeof Ctor === 'function' && /native code/.test(Ctor.toString())
     }
 
-    var hasSymbol =
+    var hasSymbol =         // 原生是否支持Symbol和Reflect
         typeof Symbol !== 'undefined' && isNative(Symbol) &&
         typeof Reflect !== 'undefined' && isNative(Reflect.ownKeys);
 
@@ -1115,33 +1115,33 @@
      * triggers change notification if the property doesn't
      * already exist.
      */
-    function set(target, key, val) {
-        if (isUndef(target) || isPrimitive(target)
+    function set(target, key, val) {        // 使target[key] = val
+        if (isUndef(target) || isPrimitive(target)      // 无法对原始类型设置属性
         ) {
             warn(("Cannot set reactive property on undefined, null, or primitive value: " + ((target))));
         }
-        if (Array.isArray(target) && isValidArrayIndex(key)) {
-            target.length = Math.max(target.length, key);
-            target.splice(key, 1, val);
+        if (Array.isArray(target) && isValidArrayIndex(key)) {  // target为数组时
+            target.length = Math.max(target.length, key);       // 设置target最大长度
+            target.splice(key, 1, val);                         // 使用splice设置target[key] = val
             return val
         }
-        if (key in target && !(key in Object.prototype)) {
+        if (key in target && !(key in Object.prototype)) {      // target已经有key这个属性，直接赋值返回
             target[key] = val;
             return val
         }
         var ob = (target).__ob__;
-        if (target._isVue || (ob && ob.vmCount)) {
+        if (target._isVue || (ob && ob.vmCount)) {  // 如果target是vue的实例，或者是根节点的data对象？？？
             warn(
                 'Avoid adding reactive properties to a Vue instance or its root $data ' +
                 'at runtime - declare it upfront in the data option.'
             );
             return val
         }
-        if (!ob) {
+        if (!ob) {      // target不是observe对象，直接赋值并返回
             target[key] = val;
             return val
         }
-        defineReactive$$1(ob.value, key, val);
+        defineReactive$$1(ob.value, key, val);      // 为observe的属性添加属性key
         ob.dep.notify();
         return val
     }
@@ -1197,13 +1197,13 @@
      * how to merge a parent option value and a child option
      * value into the final value.
      */
-    var strats = config.optionMergeStrategies;
+    var strats = config.optionMergeStrategies;      // option参数合并策略
 
     /**
      * Options with restrictions
      */
     {
-        strats.el = strats.propsData = function (parent, child, vm, key) {
+        strats.el = strats.propsData = function (parent, child, vm, key) {      // 合并option.propsData的策略
             if (!vm) {
                 warn(
                     "option \"" + key + "\" can only be used during instance " +
@@ -1217,33 +1217,33 @@
     /**
      * Helper that recursively merges two data objects together.
      */
-    function mergeData(to, from) {
+    function mergeData(to, from) {      // 合并option.data(to和from都是对象，不是函数)
         if (!from) {
             return to
         }
         var key, toVal, fromVal;
 
-        var keys = hasSymbol
+        var keys = hasSymbol            // 获取from的所有属性key
             ? Reflect.ownKeys(from)
             : Object.keys(from);
 
         for (var i = 0; i < keys.length; i++) {
             key = keys[i];
             // in case the object is already observed...
-            if (key === '__ob__') {
+            if (key === '__ob__') {     // 跳过vue的observe属性__ob__
                 continue
             }
             toVal = to[key];
             fromVal = from[key];
-            if (!hasOwn(to, key)) {
-                set(to, key, fromVal);
+            if (!hasOwn(to, key)) {     // 如果to上没有某个属性
+                set(to, key, fromVal);  // 设置to[key] = fromVal
             } else if (
                 toVal !== fromVal &&
                 isPlainObject(toVal) &&
                 isPlainObject(fromVal)
             ) {
-                mergeData(toVal, fromVal);
-            }
+                mergeData(toVal, fromVal);      // 如果toVal和fromVal都是纯对象且不相等
+            }       // 那to已经有key属性的处理呢？？？
         }
         return to
     }
@@ -1251,7 +1251,7 @@
     /**
      * Data
      */
-    function mergeDataOrFn(
+    function mergeDataOrFn(     // 合并option.data，data此时是函数或者对象，标准化为对象后调用mergeData
         parentVal,
         childVal,
         vm
@@ -1285,7 +1285,7 @@
                     ? parentVal.call(vm, vm)
                     : parentVal;
                 if (instanceData) {
-                    return mergeData(instanceData, defaultData)
+                    return mergeData(instanceData, defaultData)     // 以默认data
                 } else {
                     return defaultData
                 }
@@ -1293,13 +1293,13 @@
         }
     }
 
-    strats.data = function (
+    strats.data = function (    // 合并option.data的策略
         parentVal,
         childVal,
         vm
     ) {
         if (!vm) {
-            if (childVal && typeof childVal !== 'function') {
+            if (childVal && typeof childVal !== 'function') {   // option.data应该是函数
                 warn(
                     'The "data" option should be a function ' +
                     'that returns a per-instance value in component ' +
@@ -1318,7 +1318,7 @@
     /**
      * Hooks and props are merged as arrays.
      */
-    function mergeHook(
+    function mergeHook(     // 合并生命周期钩子的策略, 将每个钩子函数放到对应的钩子数组里
         parentVal,
         childVal
     ) {
@@ -1334,7 +1334,7 @@
             : res
     }
 
-    function dedupeHooks(hooks) {
+    function dedupeHooks(hooks) {   // 钩子去重
         var res = [];
         for (var i = 0; i < hooks.length; i++) {
             if (res.indexOf(hooks[i]) === -1) {
@@ -1344,7 +1344,7 @@
         return res
     }
 
-    LIFECYCLE_HOOKS.forEach(function (hook) {
+    LIFECYCLE_HOOKS.forEach(function (hook) {   // 定义合并生命周期钩子的策略
         strats[hook] = mergeHook;
     });
 
@@ -1355,7 +1355,7 @@
      * a three-way merge between constructor options, instance
      * options and parent options.
      */
-    function mergeAssets(
+    function mergeAssets(   // 合并components,directives,filters的策略
         parentVal,
         childVal,
         vm,
@@ -1371,7 +1371,7 @@
     }
 
     ASSET_TYPES.forEach(function (type) {
-        strats[type + 's'] = mergeAssets;
+        strats[type + 's'] = mergeAssets;   // 合并components,directives,filters的策略
     });
 
     /**
@@ -1380,7 +1380,7 @@
      * Watchers hashes should not overwrite one
      * another, so we merge them as arrays.
      */
-    strats.watch = function (
+    strats.watch = function (       // 合并option.watch的策略
         parentVal,
         childVal,
         vm,
@@ -1394,13 +1394,13 @@
             childVal = undefined;
         }
         /* istanbul ignore if */
-        if (!childVal) {
+        if (!childVal) {    // 如果没有childVal， 返回以parentVal为原型的对象
             return Object.create(parentVal || null)
         }
         {
-            assertObjectType(key, childVal, vm);
+            assertObjectType(key, childVal, vm);    // 要求childVal必须上纯对象
         }
-        if (!parentVal) {
+        if (!parentVal) {   // 没有parentVal，直接返回childVal
             return childVal
         }
         var ret = {};
@@ -1408,7 +1408,7 @@
         for (var key$1 in childVal) {
             var parent = ret[key$1];
             var child = childVal[key$1];
-            if (parent && !Array.isArray(parent)) {
+            if (parent && !Array.isArray(parent)) { // 标准化parent为数组
                 parent = [parent];
             }
             ret[key$1] = parent
@@ -1421,7 +1421,7 @@
     /**
      * Other object hashes.
      */
-    strats.props =
+    strats.props =          // 合并option.props, option.methods, option.inject, option.computed的策略
         strats.methods =
             strats.inject =
                 strats.computed = function (
@@ -1443,12 +1443,12 @@
                     }
                     return ret
                 };
-    strats.provide = mergeDataOrFn;
+    strats.provide = mergeDataOrFn;     // 合并option.provide的策略
 
     /**
      * Default strategy.
      */
-    var defaultStrat = function (parentVal, childVal) {
+    var defaultStrat = function (parentVal, childVal) {     // 默认option合并策略，后面的覆盖前面的
         return childVal === undefined
             ? parentVal
             : childVal
@@ -1562,7 +1562,7 @@
         }
     }
 
-    function assertObjectType(name, value, vm) {
+    function assertObjectType(name, value, vm) {    // 判断option[value]是否为纯对象
         if (!isPlainObject(value)) {
             warn(
                 "Invalid value for option \"" + name + "\": expected an Object, " +
@@ -1619,7 +1619,7 @@
             }
         }
 
-        function mergeField(key) {
+        function mergeField(key) {      // 合并option
             var strat = strats[key] || defaultStrat;
             options[key] = strat(parent[key], child[key], vm, key);
         }
@@ -1680,7 +1680,7 @@
         var value = propsData[key];
         // boolean casting
         var booleanIndex = getTypeIndex(Boolean, prop.type);
-        if (booleanIndex > -1) {
+        if (booleanIndex > -1) {    // 如果prop类型里有Boolean
             if (absent && !hasOwn(prop, 'default')) {
                 value = false;
             } else if (value === '' || value === hyphenate(key)) {
@@ -1711,14 +1711,14 @@
     /**
      * Get the default value of a prop.
      */
-    function getPropDefaultValue(vm, prop, key) {
+    function getPropDefaultValue(vm, prop, key) {   // 获取prop的默认值
         // no default, return undefined
         if (!hasOwn(prop, 'default')) {
             return undefined
         }
         var def = prop.default;
         // warn against non-factory defaults for Object & Array
-        if (isObject(def)) {
+        if (isObject(def)) {    // prop默认值是对象时要用函数返回
             warn(
                 'Invalid default value for prop "' + key + '": ' +
                 'Props with type Object/Array must use a factory function ' +
@@ -1744,14 +1744,14 @@
     /**
      * Assert whether a prop is valid.
      */
-    function assertProp(
+    function assertProp(    // 检查prop是否合法
         prop,
         name,
         value,
         vm,
         absent
     ) {
-        if (prop.required && absent) {
+        if (prop.required && absent) {  // 没有必须参数
             warn(
                 'Missing required prop: "' + name + '"',
                 vm
@@ -1823,20 +1823,20 @@
      * because a simple equality check will fail when running
      * across different vms / iframes.
      */
-    function getType(fn) {
+    function getType(fn) {  // 获取函数名
         var match = fn && fn.toString().match(/^\s*function (\w+)/);
         return match ? match[1] : ''
     }
 
-    function isSameType(a, b) {
+    function isSameType(a, b) { // 判断两个类型是否相同
         return getType(a) === getType(b)
     }
 
     function getTypeIndex(type, expectedTypes) {
-        if (!Array.isArray(expectedTypes)) {
+        if (!Array.isArray(expectedTypes)) {    // 如果expectedTypes不是数组，直接判断两个类型是否相同
             return isSameType(expectedTypes, type) ? 0 : -1
         }
-        for (var i = 0, len = expectedTypes.length; i < len; i++) {
+        for (var i = 0, len = expectedTypes.length; i < len; i++) { // 如果expectedTypes是数组，只要type是其中一种就返回这个索引
             if (isSameType(expectedTypes[i], type)) {
                 return i
             }
@@ -2142,7 +2142,7 @@
         };
 
         var hasProxy =
-            typeof Proxy !== 'undefined' && isNative(Proxy);
+            typeof Proxy !== 'undefined' && isNative(Proxy);    // 原生支持Proxy
 
         if (hasProxy) {
             var isBuiltInModifier = makeMap('stop,prevent,self,ctrl,shift,alt,meta,exact');
@@ -2159,13 +2159,13 @@
             });
         }
 
-        var hasHandler = {
+        var hasHandler = {      // has的代理
             has: function has(target, key) {
                 var has = key in target;
                 var isAllowed = allowedGlobals(key) ||
                     (typeof key === 'string' && key.charAt(0) === '_' && !(key in target.$data));
                 if (!has && !isAllowed) {
-                    if (key in target.$data) {
+                    if (key in target.$data) {   // 如果不在vm上，而在vm.$data上
                         warnReservedPrefix(target, key);
                     } else {
                         warnNonPresent(target, key);
@@ -2175,10 +2175,10 @@
             }
         };
 
-        var getHandler = {
+        var getHandler = {      // get的代理
             get: function get(target, key) {
                 if (typeof key === 'string' && !(key in target)) {
-                    if (key in target.$data) {
+                    if (key in target.$data) {  // 如果不在vm上，而在vm.$data上
                         warnReservedPrefix(target, key);
                     } else {
                         warnNonPresent(target, key);
@@ -2188,7 +2188,7 @@
             }
         };
 
-        initProxy = function initProxy(vm) {
+        initProxy = function initProxy(vm) {    // 初始化vm的代理
             if (hasProxy) {
                 // determine which proxy handler to use
                 var options = vm.$options;
@@ -2522,7 +2522,7 @@
         }
     }
 
-    function initInjections(vm) {
+    function initInjections(vm) {   // 初始化inject
         var result = resolveInject(vm.$options.inject, vm);
         if (result) {
             toggleObserving(false);
@@ -3579,7 +3579,7 @@
 
     /*  */
 
-    function initRender(vm) {
+    function initRender(vm) {       // 设置vm的渲染属性
         vm._vnode = null; // the root of the child tree
         vm._staticTrees = null; // v-once cached trees
         var options = vm.$options;
@@ -3863,7 +3863,7 @@
 
     /*  */
 
-    function initEvents(vm) {
+    function initEvents(vm) {   // 设置vm上的事件属性
         vm._events = Object.create(null);
         vm._hasHookEvent = false;
         // init parent attached events
@@ -4011,7 +4011,7 @@
         }
     }
 
-    function initLifecycle(vm) {
+    function initLifecycle(vm) {    // 设置vm上的生命周期属性
         var options = vm.$options;
 
         // locate first non-abstract parent
@@ -4020,11 +4020,11 @@
             while (parent.$options.abstract && parent.$parent) {
                 parent = parent.$parent;
             }
-            parent.$children.push(vm);
+            parent.$children.push(vm);      // 将vm放到父组件的$children属性中
         }
 
-        vm.$parent = parent;
-        vm.$root = parent ? parent.$root : vm;
+        vm.$parent = parent;        // 设置$parent
+        vm.$root = parent ? parent.$root : vm;  // 设置$root
 
         vm.$children = [];
         vm.$refs = {};
@@ -4317,7 +4317,7 @@
         }
     }
 
-    function callHook(vm, hook) {
+    function callHook(vm, hook) {   // 调用生命周期钩子
         // #7573 disable dep collection when invoking lifecycle hooks
         pushTarget();
         var handlers = vm.$options[hook];
@@ -4732,7 +4732,7 @@
         set: noop
     };
 
-    function proxy(target, sourceKey, key) {
+    function proxy(target, sourceKey, key) {    //创建代理，访问target[key]时相当于访问target[sourceKey][key]
         sharedPropertyDefinition.get = function proxyGetter() {
             return this[sourceKey][key]
         };
@@ -4742,7 +4742,7 @@
         Object.defineProperty(target, key, sharedPropertyDefinition);
     }
 
-    function initState(vm) {
+    function initState(vm) {    // 初始化props,methods,data,computed,watch
         vm._watchers = [];
         var opts = vm.$options;
         if (opts.props) {
@@ -4764,15 +4764,15 @@
         }
     }
 
-    function initProps(vm, propsOptions) {
+    function initProps(vm, propsOptions) {  // 初始化props
         var propsData = vm.$options.propsData || {};
         var props = vm._props = {};
         // cache prop keys so that future props updates can iterate using Array
         // instead of dynamic object key enumeration.
         var keys = vm.$options._propKeys = [];
-        var isRoot = !vm.$parent;
+        var isRoot = !vm.$parent;       // 没有$parent属性的vm对象就是根组件
         // root instance props should be converted
-        if (!isRoot) {
+        if (!isRoot) { // 非根节点不应该监听
             toggleObserving(false);
         }
         var loop = function (key) {
@@ -4804,7 +4804,7 @@
             // during Vue.extend(). We only need to proxy props defined at
             // instantiation here.
             if (!(key in vm)) {
-                proxy(vm, "_props", key);
+                proxy(vm, "_props", key);   // 将属性key代理到vm上
             }
         };
 
@@ -4961,18 +4961,18 @@
         }
     }
 
-    function initMethods(vm, methods) {
+    function initMethods(vm, methods) {     // 初始化methods
         var props = vm.$options.props;
         for (var key in methods) {
             {
-                if (typeof methods[key] !== 'function') {
+                if (typeof methods[key] !== 'function') { // methods的属性必须上函数
                     warn(
                         "Method \"" + key + "\" has type \"" + (typeof methods[key]) + "\" in the component definition. " +
                         "Did you reference the function correctly?",
                         vm
                     );
                 }
-                if (props && hasOwn(props, key)) {
+                if (props && hasOwn(props, key)) {  // methods的属性不能和prop同名
                     warn(
                         ("Method \"" + key + "\" has already been defined as a prop."),
                         vm
@@ -5112,12 +5112,12 @@
             }
             // expose real self
             vm._self = vm;
-            initLifecycle(vm);
-            initEvents(vm);
-            initRender(vm);
+            initLifecycle(vm);  // 设置vm上的生命周期属性
+            initEvents(vm);     // 设置vm上的事件属性
+            initRender(vm);     // 设置vm的渲染属性
             callHook(vm, 'beforeCreate');
-            initInjections(vm); // resolve injections before data/props
-            initState(vm);
+            initInjections(vm); // resolve injections before data/props  初始化inject
+            initState(vm);  // 初始化props,methods,data,computed,watch
             initProvide(vm); // resolve provide after data/props
             callHook(vm, 'created');
 
@@ -5576,7 +5576,7 @@
 
     // these are reserved for web because they are directly compiled away
     // during template compilation
-    var isReservedAttr = makeMap('style,class');
+    var isReservedAttr = makeMap('style,class');  // 是否为web原生的属性且直接编译的
 
     // attributes that should be using props for binding
     var acceptValue = makeMap('input,textarea,option,select,progress');

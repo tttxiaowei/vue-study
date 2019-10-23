@@ -1,16 +1,32 @@
 window.onload = function () {
     const app = new Vue({
         el: '#app',
-        data: {
-            // aaa: 2131,
+        props: ['ppp'],
+        data() {
+            return {
+                mmm: 111,
+            }
         },
         computed: {
+            ccc() {
+                return this.mmm * 2
+            },
         },
         watch: {
+            ccc(newVal, oldVal) {
+                console.log(newVal)
+            },
         },
-        methods: {
+        beforeCreate() {
+            console.log('#app beforeCreate this:', this)
         },
         created() {
+            console.log('#app created this:', this)
+        },
+        methods: {
+            fff() {
+                console.log('fff')
+            },
         },
     })
 }
