@@ -167,7 +167,7 @@
     /**
      * Create a cached version of a pure function.
      */
-    function cached(fn) {
+    function cached(fn) {   // 创建缓存，把每次调用cachedFn的字符串的值缓存下来
         var cache = Object.create(null);
         return (function cachedFn(str) {
             var hit = cache[str];
@@ -524,7 +524,7 @@
      */
     var bailRE = new RegExp(("[^" + (unicodeRegExp.source) + ".$_\\d]"));
 
-    function parsePath(path) {
+    function parsePath(path) {  // 根据路径生成函数，传入对象obj定位到path这个属性
         if (bailRE.test(path)) {
             return
         }
@@ -580,7 +580,7 @@
     // this needs to be lazy-evaled because vue may be required before
     // vue-server-renderer can set VUE_ENV
     var _isServer;
-    var isServerRendering = function () {
+    var isServerRendering = function () {   // 是否为服务区编译
         if (_isServer === undefined) {
             /* istanbul ignore if */
             if (!inBrowser && !inWeex && typeof global !== 'undefined') {
@@ -738,7 +738,7 @@
 
     /*  */
 
-    var uid = 0;
+    var uid = 0;    // 每个Dep实例的唯一uid
 
     /**
      * A dep is an observable that can have multiple
@@ -749,7 +749,7 @@
         this.subs = [];
     };
 
-    Dep.prototype.addSub = function addSub(sub) {
+    Dep.prototype.addSub = function addSub(sub) {   // 把watcher添加到subs中
         this.subs.push(sub);
     };
 
@@ -757,8 +757,8 @@
         remove(this.subs, sub);
     };
 
-    Dep.prototype.depend = function depend() {
-        if (Dep.target) {
+    Dep.prototype.depend = function depend() {  // 添加依赖
+        if (Dep.target) {   // 将dep对象添加到当前Dep.target这个Watch上
             Dep.target.addDep(this);
         }
     };
@@ -976,7 +976,7 @@
      * getter/setters. This method should only be called when
      * value type is Object.
      */
-    Observer.prototype.walk = function walk(obj) {
+    Observer.prototype.walk = function walk(obj) { // 针对对象，为obj的每个属性定义相应getter,setter
         var keys = Object.keys(obj);
         for (var i = 0; i < keys.length; i++) {
             defineReactive$$1(obj, keys[i]);
@@ -986,7 +986,7 @@
     /**
      * Observe a list of Array items.
      */
-    Observer.prototype.observeArray = function observeArray(items) {
+    Observer.prototype.observeArray = function observeArray(items) { // 针对数组，observe数组的每个属性，但是observe函数只能observe数组和对象，所以数组的基本属性不能双向绑定
         for (var i = 0, l = items.length; i < l; i++) {
             observe(items[i]);
         }
@@ -1022,12 +1022,12 @@
      * returns the new observer if successfully observed,
      * or the existing observer if the value already has one.
      */
-    function observe(value, asRootData) {
+    function observe(value, asRootData) {   // 监听value，返回ob,只能observe对象和数组
         if (!isObject(value) || value instanceof VNode) {
             return
         }
         var ob;
-        if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+        if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {  // 已经被监听了
             ob = value.__ob__;
         } else if (
             shouldObserve &&
@@ -1047,7 +1047,7 @@
     /**
      * Define a reactive property on an Object.
      */
-    function defineReactive$$1(
+    function defineReactive$$1( // 将对象obj的属性key定义为相应式的
         obj,
         key,
         val,
@@ -1062,18 +1062,18 @@
         }
 
         // cater for pre-defined getter/setters
-        var getter = property && property.get;
+        var getter = property && property.get;  // 把原来的getter，setter缓存起来
         var setter = property && property.set;
-        if ((!getter || setter) && arguments.length === 2) {
-            val = obj[key];
+        if ((!getter || setter) && arguments.length === 2) {    // 只传了两个参数，且没有getter或者有setter时
+            val = obj[key]; // 把value缓存起来
         }
 
-        var childOb = !shallow && observe(val);
+        var childOb = !shallow && observe(val);     // 监听属性值
         Object.defineProperty(obj, key, {
             enumerable: true,
             configurable: true,
             get: function reactiveGetter() {
-                var value = getter ? getter.call(obj) : val;
+                var value = getter ? getter.call(obj) : val;    // 调用原有getter或者缓存的val
                 if (Dep.target) {
                     dep.depend();
                     if (childOb) {
@@ -1088,7 +1088,7 @@
             set: function reactiveSetter(newVal) {
                 var value = getter ? getter.call(obj) : val;
                 /* eslint-disable no-self-compare */
-                if (newVal === value || (newVal !== newVal && value !== value)) {
+                if (newVal === value || (newVal !== newVal && value !== value)) {   // 如果值没变或者从NaA赋值为NaN，则直接返回
                     return
                 }
                 /* eslint-enable no-self-compare */
@@ -1096,15 +1096,15 @@
                     customSetter();
                 }
                 // #7981: for accessor properties without setter
-                if (getter && !setter) {
+                if (getter && !setter) {    // 只有getter没有setter直接返回
                     return
                 }
-                if (setter) {
+                if (setter) {   // 原来有setter的话调用setter
                     setter.call(obj, newVal);
-                } else {
+                } else {        // 原来没有setter的话修改缓存的val
                     val = newVal;
                 }
-                childOb = !shallow && observe(newVal);
+                childOb = !shallow && observe(newVal);  // 监听新赋的值
                 dep.notify();
             }
         });
@@ -2204,7 +2204,7 @@
 
     /*  */
 
-    var seenObjects = new _Set();
+    var seenObjects = new _Set();   // traverse用来缓存dep.id
 
     /**
      * Recursively traverse an object to evoke all converted
@@ -2231,13 +2231,13 @@
         }
         if (isA) {
             i = val.length;
-            while (i--) {
+            while (i--) {   // 遍历数组的每个值
                 _traverse(val[i], seen);
             }
         } else {
             keys = Object.keys(val);
             i = keys.length;
-            while (i--) {
+            while (i--) {   // 遍历对象的每个属性
                 _traverse(val[keys[i]], seen);
             }
         }
@@ -2513,7 +2513,7 @@
 
     /*  */
 
-    function initProvide(vm) {
+    function initProvide(vm) {  // 初始化provide，把provide的属性放到vm实例上
         var provide = vm.$options.provide;
         if (provide) {
             vm._provided = typeof provide === 'function'
@@ -4120,7 +4120,7 @@
         };
     }
 
-    function mountComponent(
+    function mountComponent(    // 挂载组件
         vm,
         el,
         hydrating
@@ -4158,12 +4158,12 @@
                 var endTag = "vue-perf-end:" + id;
 
                 mark(startTag);
-                var vnode = vm._render();
+                var vnode = vm._render();       // render
                 mark(endTag);
                 measure(("vue " + name + " render"), startTag, endTag);
 
                 mark(startTag);
-                vm._update(vnode, hydrating);
+                vm._update(vnode, hydrating);   // patch
                 mark(endTag);
                 measure(("vue " + name + " patch"), startTag, endTag);
             };
@@ -4519,7 +4519,7 @@
     /*  */
 
 
-    var uid$2 = 0;
+    var uid$2 = 0;   // 每个Watcher实例的唯一uid
 
     /**
      * A watcher parses an expression, collects dependencies,
@@ -4580,7 +4580,7 @@
     /**
      * Evaluate the getter, and re-collect dependencies.
      */
-    Watcher.prototype.get = function get() {
+    Watcher.prototype.get = function get() {    // 调用watch的getter方法
         pushTarget(this);
         var value;
         var vm = this.vm;
@@ -4607,7 +4607,7 @@
     /**
      * Add a dependency to this directive.
      */
-    Watcher.prototype.addDep = function addDep(dep) {
+    Watcher.prototype.addDep = function addDep(dep) {   // 添加dep到依赖列表中
         var id = dep.id;
         if (!this.newDepIds.has(id)) {
             this.newDepIds.add(id);
@@ -4621,19 +4621,19 @@
     /**
      * Clean up for dependency collection.
      */
-    Watcher.prototype.cleanupDeps = function cleanupDeps() {
+    Watcher.prototype.cleanupDeps = function cleanupDeps() {    // 清除deps
         var i = this.deps.length;
         while (i--) {
             var dep = this.deps[i];
-            if (!this.newDepIds.has(dep.id)) {
+            if (!this.newDepIds.has(dep.id)) {  // newDepIds中不存在老的dep
                 dep.removeSub(this);
             }
         }
-        var tmp = this.depIds;
+        var tmp = this.depIds;  // 清空depIds，将newDepIds赋值给depIds
         this.depIds = this.newDepIds;
         this.newDepIds = tmp;
         this.newDepIds.clear();
-        tmp = this.deps;
+        tmp = this.deps;  // 清空deps，将newDeps赋值给deps
         this.deps = this.newDeps;
         this.newDeps = tmp;
         this.newDeps.length = 0;
@@ -4812,7 +4812,7 @@
         toggleObserving(true);
     }
 
-    function initData(vm) {
+    function initData(vm) {     // 初始化data属性，
         var data = vm.$options.data;
         data = vm._data = typeof data === 'function'
             ? getData(data, vm)
@@ -4833,20 +4833,20 @@
         while (i--) {
             var key = keys[i];
             {
-                if (methods && hasOwn(methods, key)) {
+                if (methods && hasOwn(methods, key)) {  // data属性不能和method相同
                     warn(
                         ("Method \"" + key + "\" has already been defined as a data property."),
                         vm
                     );
                 }
             }
-            if (props && hasOwn(props, key)) {
+            if (props && hasOwn(props, key)) {  // data属性不能和prop相同
                 warn(
                     "The data property \"" + key + "\" is already declared as a prop. " +
                     "Use prop default value instead.",
                     vm
                 );
-            } else if (!isReserved(key)) {
+            } else if (!isReserved(key)) {      // 不是以$, _开头的属性
                 proxy(vm, "_data", key);
             }
         }
@@ -4854,7 +4854,7 @@
         observe(data, true /* asRootData */);
     }
 
-    function getData(data, vm) {
+    function getData(data, vm) {    // 执行data函数
         // #7573 disable dep collection when invoking data getters
         pushTarget();
         try {
@@ -4869,15 +4869,15 @@
 
     var computedWatcherOptions = {lazy: true};
 
-    function initComputed(vm, computed) {
+    function initComputed(vm, computed) {   // 初始化计算属性
         // $flow-disable-line
-        var watchers = vm._computedWatchers = Object.create(null);
+        var watchers = vm._computedWatchers = Object.create(null);  // 计算属性的watcher
         // computed properties are just getters during SSR
         var isSSR = isServerRendering();
 
         for (var key in computed) {
             var userDef = computed[key];
-            var getter = typeof userDef === 'function' ? userDef : userDef.get;
+            var getter = typeof userDef === 'function' ? userDef : userDef.get;     // 计算数学的get函数
             if (getter == null) {
                 warn(
                     ("Getter is missing for computed property \"" + key + "\"."),
@@ -4900,7 +4900,7 @@
             // at instantiation here.
             if (!(key in vm)) {
                 defineComputed(vm, key, userDef);
-            } else {
+            } else {     // vm上如果已经有同名的属性则报错
                 if (key in vm.$data) {
                     warn(("The computed property \"" + key + "\" is already defined in data."), vm);
                 } else if (vm.$options.props && key in vm.$options.props) {
@@ -4910,37 +4910,37 @@
         }
     }
 
-    function defineComputed(
+    function defineComputed(    // 定义计算属性
         target,
         key,
         userDef
     ) {
-        var shouldCache = !isServerRendering();
-        if (typeof userDef === 'function') {
-            sharedPropertyDefinition.get = shouldCache
+        var shouldCache = !isServerRendering();     // 非ssr就要缓存
+        if (typeof userDef === 'function') {        // 定义时传的是函数
+            sharedPropertyDefinition.get = shouldCache  // 获取get函数
                 ? createComputedGetter(key)
                 : createGetterInvoker(userDef);
             sharedPropertyDefinition.set = noop;
-        } else {
+        } else {    // 定义时传的是对象
             sharedPropertyDefinition.get = userDef.get
                 ? shouldCache && userDef.cache !== false
                     ? createComputedGetter(key)
                     : createGetterInvoker(userDef.get)
                 : noop;
-            sharedPropertyDefinition.set = userDef.set || noop;
+            sharedPropertyDefinition.set = userDef.set || noop; // 没设置set，则设置为默认set
         }
         if (sharedPropertyDefinition.set === noop) {
-            sharedPropertyDefinition.set = function () {
+            sharedPropertyDefinition.set = function () {    // 调用默认set时报错
                 warn(
                     ("Computed property \"" + key + "\" was assigned to but it has no setter."),
                     this
                 );
             };
         }
-        Object.defineProperty(target, key, sharedPropertyDefinition);
+        Object.defineProperty(target, key, sharedPropertyDefinition);   // 定义计算属性
     }
 
-    function createComputedGetter(key) {
+    function createComputedGetter(key) {    // 创建计算属性的get函数
         return function computedGetter() {
             var watcher = this._computedWatchers && this._computedWatchers[key];
             if (watcher) {
@@ -4985,14 +4985,14 @@
                     );
                 }
             }
-            vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm);
+            vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm);   // 给每个method绑定this
         }
     }
 
-    function initWatch(vm, watch) {
-        for (var key in watch) {
+    function initWatch(vm, watch) {     // 初始化watch
+        for (var key in watch) {        // 遍历所有watch
             var handler = watch[key];
-            if (Array.isArray(handler)) {
+            if (Array.isArray(handler)) {   // 如果监听处理函数是一个数组
                 for (var i = 0; i < handler.length; i++) {
                     createWatcher(vm, key, handler[i]);
                 }
@@ -5002,17 +5002,17 @@
         }
     }
 
-    function createWatcher(
+    function createWatcher(     // 创建watch监听函数
         vm,
         expOrFn,
         handler,
         options
     ) {
-        if (isPlainObject(handler)) {
+        if (isPlainObject(handler)) {   // 如果监听函数是个对象
             options = handler;
             handler = handler.handler;
         }
-        if (typeof handler === 'string') {
+        if (typeof handler === 'string') {  // 如果是字符串，直接从vm实例上取
             handler = vm[handler];
         }
         return vm.$watch(expOrFn, handler, options)
@@ -5118,7 +5118,7 @@
             callHook(vm, 'beforeCreate');
             initInjections(vm); // resolve injections before data/props  初始化inject
             initState(vm);  // 初始化props,methods,data,computed,watch
-            initProvide(vm); // resolve provide after data/props
+            initProvide(vm); // resolve provide after data/props  把provide的属性放到vm实例上
             callHook(vm, 'created');
 
             /* istanbul ignore if */
@@ -5793,7 +5793,7 @@
     /**
      * Query an element selector if it's not an element already.
      */
-    function query(el) {
+    function query(el) {    // 查询元素
         if (typeof el === 'string') {
             var selected = document.querySelector(el);
             if (!selected) {
@@ -12153,7 +12153,7 @@
 
     /*  */
 
-    var idToTemplate = cached(function (id) {
+    var idToTemplate = cached(function (id) {   // 根据id查询元素，返回innerHTML，并且缓存起来
         var el = query(id);
         return el && el.innerHTML
     });
@@ -12166,7 +12166,7 @@
         el = el && query(el);
 
         /* istanbul ignore if */
-        if (el === document.body || el === document.documentElement) {
+        if (el === document.body || el === document.documentElement) {  // 不能挂在html,body上
             warn(
                 "Do not mount Vue to <html> or <body> - mount to normal elements instead."
             );
@@ -12175,11 +12175,11 @@
 
         var options = this.$options;
         // resolve template/el and convert to render function
-        if (!options.render) {
+        if (!options.render) {      // 如果没有传options.render
             var template = options.template;
-            if (template) {
+            if (template) {     // 如果有传options.template
                 if (typeof template === 'string') {
-                    if (template.charAt(0) === '#') {
+                    if (template.charAt(0) === '#') {   // 如果template是id，获取这个元素
                         template = idToTemplate(template);
                         /* istanbul ignore if */
                         if (!template) {
@@ -12189,7 +12189,7 @@
                             );
                         }
                     }
-                } else if (template.nodeType) {
+                } else if (template.nodeType) {     // 如果template是元素，直接返回innerHTML
                     template = template.innerHTML;
                 } else {
                     {
@@ -12206,7 +12206,7 @@
                     mark('compile');
                 }
 
-                var ref = compileToFunctions(template, {
+                var ref = compileToFunctions(template, {    // 生成render函数
                     outputSourceRange: "development" !== 'production',
                     shouldDecodeNewlines: shouldDecodeNewlines,
                     shouldDecodeNewlinesForHref: shouldDecodeNewlinesForHref,
@@ -12225,7 +12225,7 @@
                 }
             }
         }
-        return mount.call(this, el, hydrating)
+        return mount.call(this, el, hydrating)  // 对template进行渲染
     };
 
     /**

@@ -5,6 +5,9 @@ window.onload = function () {
         data() {
             return {
                 mmm: 111,
+                aaa: [12, 3, {
+                    bb: 2,
+                }],
             }
         },
         computed: {
