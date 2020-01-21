@@ -94,10 +94,10 @@
     /**
      * Convert a value to a string that is actually rendered.
      */
-    function toString(val) {
+    function toString(val) {    // 将val转化为字符串返回
         return val == null
             ? ''
-            : Array.isArray(val) || (isPlainObject(val) && val.toString === _toString)
+            : Array.isArray(val) || (isPlainObject(val) && val.toString === _toString)  // 是数组或者纯对象则返回json字符串，否则直接使用String转化为字符串
                 ? JSON.stringify(val, null, 2)
                 : String(val)
     }
@@ -106,9 +106,9 @@
      * Convert an input value to a number for persistence.
      * If the conversion fails, return original string.
      */
-    function toNumber(val) {
+    function toNumber(val) {    // 将val转化为数字返回
         var n = parseFloat(val);
-        return isNaN(n) ? val : n
+        return isNaN(n) ? val : n   // 转化为后为NaN则返回val自身
     }
 
     /**
@@ -2923,7 +2923,7 @@
      * Runtime helper for v-once.
      * Effectively it means marking the node as static with a unique key.
      */
-    function markOnce(
+    function markOnce(  // 标记v-once
         tree,
         index,
         key
@@ -3030,7 +3030,7 @@
 
     /*  */
 
-    function installRenderHelpers(target) {
+    function installRenderHelpers(target) {     // 绑定渲染函数
         target._o = markOnce;
         target._n = toNumber;
         target._s = toString;
@@ -3591,7 +3591,7 @@
         // so that we get proper render context inside it.
         // args order: tag, data, children, normalizationType, alwaysNormalize
         // internal version is used by render functions compiled from templates
-        vm._c = function (a, b, c, d) {
+        vm._c = function (a, b, c, d) {     // 绑定实例的createElement函数
             return createElement(vm, a, b, c, d, false);
         };
         // normalization is always applied for the public version, used in
@@ -3619,7 +3619,7 @@
 
     function renderMixin(Vue) {     // 定义Vue原型上的$nextTick, _render
         // install runtime convenience helpers
-        installRenderHelpers(Vue.prototype);
+        installRenderHelpers(Vue.prototype);    // 绑定一些渲染函数到实例上
 
         Vue.prototype.$nextTick = function (fn) {
             return nextTick(fn, this)
@@ -5740,7 +5740,7 @@
         true
     );
 
-    var isPreTag = function (tag) {
+    var isPreTag = function (tag) { // 判断是否为pre标签
         return tag === 'pre';
     };
 
@@ -7298,7 +7298,7 @@
     // doesn't get processed by processAttrs.
     // By default it does NOT remove it from the map (attrsMap) because the map is
     // needed during codegen.
-    function getAndRemoveAttr(
+    function getAndRemoveAttr(  // 返回并删除ast中某个属性
         el,
         name,
         removeFromMap
@@ -9325,7 +9325,7 @@
         delimiters
     ) {
         var tagRE = delimiters ? buildRegex(delimiters) : defaultTagRE;
-        if (!tagRE.test(text)) {
+        if (!tagRE.test(text)) {    // 如果文本中没有{{}}的代码，直接返回
             return
         }
         var tokens = [];
@@ -9448,7 +9448,7 @@
     var decoder;
 
     var he = {
-        decode: function decode(html) {
+        decode: function decode(html) { // 通过创建div将内容转化为纯文本
             decoder = decoder || document.createElement('div');
             decoder.innerHTML = html;
             return decoder.textContent
@@ -9457,7 +9457,7 @@
 
     /*  */
 
-    var isUnaryTag = makeMap(
+    var isUnaryTag = makeMap(  // 是否为无闭合标签的元素
         'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
         'link,meta,param,source,track,wbr'
     );
@@ -9513,7 +9513,7 @@
 
     // #5992
     var isIgnoreNewlineTag = makeMap('pre,textarea', true);
-    var shouldIgnoreFirstNewline = function (tag, html) {
+    var shouldIgnoreFirstNewline = function (tag, html) {   // 判断标签是否能忽略开始标签后的第一个换行
         return tag && isIgnoreNewlineTag(tag) && html[0] === '\n';
     };
 
@@ -9524,25 +9524,25 @@
         })
     }
 
-    function parseHTML(html, options) {
+    function parseHTML(html, options) { // 解析html字符串模板
         var stack = [];
         var expectHTML = options.expectHTML;
         var isUnaryTag$$1 = options.isUnaryTag || no;
         var canBeLeftOpenTag$$1 = options.canBeLeftOpenTag || no;
         var index = 0;
         var last, lastTag;
-        while (html) {
+        while (html) {      // 只要html模板没解析完就一直解析
             last = html;
             // Make sure we're not in a plaintext content element like script/style
             if (!lastTag || !isPlainTextElement(lastTag)) {
-                var textEnd = html.indexOf('<');
-                if (textEnd === 0) {
+                var textEnd = html.indexOf('<');    // 定位下一个<的位置
+                if (textEnd === 0) {    // 如果当前模板以<开始
                     // Comment:
-                    if (comment.test(html)) {
+                    if (comment.test(html)) {   // 如果是注释
                         var commentEnd = html.indexOf('-->');
 
                         if (commentEnd >= 0) {
-                            if (options.shouldKeepComment) {
+                            if (options.shouldKeepComment) {    // 如果需要保存注释则处理，否则直接删掉
                                 options.comment(html.substring(4, commentEnd), index, index + commentEnd + 3);
                             }
                             advance(commentEnd + 3);
@@ -9551,7 +9551,7 @@
                     }
 
                     // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
-                    if (conditionalComment.test(html)) {
+                    if (conditionalComment.test(html)) {    // 如果是<![CDATA]>这种注释， 直接删掉
                         var conditionalEnd = html.indexOf(']>');
 
                         if (conditionalEnd >= 0) {
@@ -9562,14 +9562,14 @@
 
                     // Doctype:
                     var doctypeMatch = html.match(doctype);
-                    if (doctypeMatch) {
+                    if (doctypeMatch) {     // 如果是Doctype声明，直接删掉
                         advance(doctypeMatch[0].length);
                         continue
                     }
 
                     // End tag:
                     var endTagMatch = html.match(endTag);
-                    if (endTagMatch) {
+                    if (endTagMatch) {      // 如果是结束标签，调用parseEndTag处理
                         var curIndex = index;
                         advance(endTagMatch[0].length);
                         parseEndTag(endTagMatch[1], curIndex, index);
@@ -9578,9 +9578,9 @@
 
                     // Start tag:
                     var startTagMatch = parseStartTag();
-                    if (startTagMatch) {
+                    if (startTagMatch) {    // 如果是开始标签，调用handleStartTag处理
                         handleStartTag(startTagMatch);
-                        if (shouldIgnoreFirstNewline(startTagMatch.tagName, html)) {
+                        if (shouldIgnoreFirstNewline(startTagMatch.tagName, html)) {    // 判断标签是否能忽略开始标签后的第一个换行
                             advance(1);
                         }
                         continue
@@ -9589,7 +9589,7 @@
 
                 var text = (void 0), rest = (void 0), next = (void 0);
                 if (textEnd >= 0) {
-                    rest = html.slice(textEnd);
+                    rest = html.slice(textEnd); // 下一个标签
                     while (
                         !endTag.test(rest) &&
                         !startTagOpen.test(rest) &&
@@ -9616,7 +9616,7 @@
                 }
 
                 if (options.chars && text) {
-                    options.chars(text, index - text.length, index);
+                    options.chars(text, index - text.length, index);    // 处理文本内容
                 }
             } else {
                 var endTagLength = 0;
@@ -9659,7 +9659,7 @@
             html = html.substring(n);
         }
 
-        function parseStartTag() {
+        function parseStartTag() {      // 将html中的开始标签解析为对象
             var start = html.match(startTagOpen);
             if (start) {
                 var match = {
@@ -9669,7 +9669,7 @@
                 };
                 advance(start[0].length);
                 var end, attr;
-                while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {
+                while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {   // 解析属性
                     attr.start = index;
                     advance(attr[0].length);
                     attr.end = index;
@@ -9684,7 +9684,7 @@
             }
         }
 
-        function handleStartTag(match) {
+        function handleStartTag(match) {    // 处理parseStartTag返回的开始标签对象
             var tagName = match.tagName;
             var unarySlash = match.unarySlash;
 
@@ -9701,7 +9701,7 @@
 
             var l = match.attrs.length;
             var attrs = new Array(l);
-            for (var i = 0; i < l; i++) {
+            for (var i = 0; i < l; i++) {   // 处理属性
                 var args = match.attrs[i];
                 var value = args[3] || args[4] || args[5] || '';
                 var shouldDecodeNewlines = tagName === 'a' && args[1] === 'href'
@@ -9729,7 +9729,7 @@
             }
 
             if (options.start) {
-                options.start(tagName, attrs, unary, match.start, match.end);
+                options.start(tagName, attrs, unary, match.start, match.end);   // 调用start函数处理，生成ast
             }
         }
 
@@ -9824,7 +9824,7 @@
     var platformGetTagNamespace;
     var maybeComponent;
 
-    function createASTElement(
+    function createASTElement(      // 创建ast节点
         tag,
         attrs,
         parent
@@ -9955,7 +9955,7 @@
             }
         }
 
-        function checkRootConstraints(el) {
+        function checkRootConstraints(el) {     // 检查根节点是否合法
             if (el.tag === 'slot' || el.tag === 'template') {
                 warnOnce(
                     "Cannot use <" + (el.tag) + "> as component root element because it may " +
@@ -9981,7 +9981,7 @@
             shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
             shouldKeepComment: options.comments,
             outputSourceRange: options.outputSourceRange,
-            start: function start(tag, attrs, unary, start$1, end) {
+            start: function start(tag, attrs, unary, start$1, end) {    // 处理开始标签对象,生成ast节点
                 // check namespace.
                 // inherit parent ns if there is one
                 var ns = (currentParent && currentParent.ns) || platformGetTagNamespace(tag);
@@ -9992,7 +9992,7 @@
                     attrs = guardIESVGBug(attrs);
                 }
 
-                var element = createASTElement(tag, attrs, currentParent);
+                var element = createASTElement(tag, attrs, currentParent);  // 创建ast
                 if (ns) {
                     element.ns = ns;
                 }
@@ -10056,7 +10056,7 @@
                 if (!root) {
                     root = element;
                     {
-                        checkRootConstraints(root);
+                        checkRootConstraints(root); // 检查根节点是否合法
                     }
                 }
 
@@ -10064,7 +10064,7 @@
                     currentParent = element;
                     stack.push(element);
                 } else {
-                    closeElement(element);
+                    closeElement(element);  // 如果是没闭合标签的元素，手动关闭
                 }
             },
 
@@ -10079,7 +10079,7 @@
                 closeElement(element);
             },
 
-            chars: function chars(text, start, end) {
+            chars: function chars(text, start, end) {   // 处理文本内容
                 if (!currentParent) {
                     {
                         if (text === template) {
@@ -10106,12 +10106,12 @@
                 }
                 var children = currentParent.children;
                 if (inPre || text.trim()) {
-                    text = isTextTag(currentParent) ? text : decodeHTMLCached(text);
+                    text = isTextTag(currentParent) ? text : decodeHTMLCached(text);    // 将文本转化为纯文本，并缓存
                 } else if (!children.length) {
                     // remove the whitespace-only node right after an opening tag
                     text = '';
                 } else if (whitespaceOption) {
-                    if (whitespaceOption === 'condense') {
+                        if (whitespaceOption === 'condense') {
                         // in condense mode, remove the whitespace node if it contains
                         // line break, otherwise condense to a single space
                         text = lineBreakRE.test(text) ? '' : ' ';
@@ -10128,7 +10128,7 @@
                     }
                     var res;
                     var child;
-                    if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
+                    if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {   // 解析纯文本
                         child = {
                             type: 2,
                             expression: res.expression,
@@ -10170,13 +10170,13 @@
         return root
     }
 
-    function processPre(el) {
+    function processPre(el) {   // 处理ast节点的v-pre属性
         if (getAndRemoveAttr(el, 'v-pre') != null) {
             el.pre = true;
         }
     }
 
-    function processRawAttrs(el) {
+    function processRawAttrs(el) {  // 用JSON.stringify处理属性的值
         var list = el.attrsList;
         var len = list.length;
         if (len) {
@@ -10257,7 +10257,7 @@
         }
     }
 
-    function processFor(el) {
+    function processFor(el) {   // 处理v-for属性
         var exp;
         if ((exp = getAndRemoveAttr(el, 'v-for'))) {
             var res = parseFor(exp);
@@ -10273,7 +10273,7 @@
     }
 
 
-    function parseFor(exp) {
+    function parseFor(exp) {    // 解析v-for的代码
         var inMatch = exp.match(forAliasRE);
         if (!inMatch) {
             return
@@ -10294,7 +10294,7 @@
         return res
     }
 
-    function processIf(el) {
+    function processIf(el) {    // 处理v-if属性
         var exp = getAndRemoveAttr(el, 'v-if');
         if (exp) {
             el.if = exp;
@@ -10354,7 +10354,7 @@
         el.ifConditions.push(condition);
     }
 
-    function processOnce(el) {
+    function processOnce(el) {  // 处理v-once属性
         var once$$1 = getAndRemoveAttr(el, 'v-once');
         if (once$$1 != null) {
             el.once = true;
@@ -10683,7 +10683,7 @@
         }
     }
 
-    function makeAttrsMap(attrs) {
+    function makeAttrsMap(attrs) {    // 将attrs list转化为{name:value}的对象
         var map = {};
         for (var i = 0, l = attrs.length; i < l; i++) {
             if (
@@ -10697,7 +10697,7 @@
     }
 
     // for script (e.g. type="x/template") or style, do not decode content
-    function isTextTag(el) {
+    function isTextTag(el) {    // 是否为文本标签
         return el.tag === 'script' || el.tag === 'style'
     }
 
@@ -10746,7 +10746,7 @@
 
     /*  */
 
-    function preTransformNode(el, options) {
+    function preTransformNode(el, options) {    // 处理input节点
         if (el.tag === 'input') {
             var map = el.attrsMap;
             if (!map['v-model']) {
@@ -10877,7 +10877,7 @@
      *    create fresh nodes for them on each re-render;
      * 2. Completely skip them in the patching process.
      */
-    function optimize(root, options) {
+    function optimize(root, options) {      // 标记ast树中的静态节点
         if (!root) {
             return
         }
@@ -11741,7 +11741,7 @@
     }
 
     // #3895, #4268
-    function transformSpecialNewlines(text) {
+    function transformSpecialNewlines(text) {   // 将特殊换行符转义
         return text
             .replace(/\u2028/g, '\\u2028')
             .replace(/\u2029/g, '\\u2029')
@@ -12038,8 +12038,8 @@
 
     /*  */
 
-    function createCompilerCreator(baseCompile) {
-        return function createCompiler(baseOptions) {
+    function createCompilerCreator(baseCompile) {   // 返回一个创建compiler函数的函数
+        return function createCompiler(baseOptions) {   // 创建compiler函数
             function compile(
                 template,
                 options
@@ -12113,15 +12113,15 @@
     // `createCompilerCreator` allows creating compilers that use alternative
     // parser/optimizer/codegen, e.g the SSR optimizing compiler.
     // Here we just export a default compiler using the default parts.
-    var createCompiler = createCompilerCreator(function baseCompile(
+    var createCompiler = createCompilerCreator(function baseCompile(    // 创建一个基础的compiler函数
         template,
         options
     ) {
-        var ast = parse(template.trim(), options);
+        var ast = parse(template.trim(), options);  // 解析模板，生成ast
         if (options.optimize !== false) {
             optimize(ast, options);
         }
-        var code = generate(ast, options);
+        var code = generate(ast, options);  // 根据ast生成render函数
         return {
             ast: ast,
             render: code.render,
