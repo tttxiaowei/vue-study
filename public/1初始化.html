@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue-study</title>
+</head>
+<body>
+<div id="app">
+    {{ aaa }}
+</div>
+<script src="libs/vue.js"></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            aaa: 123
+        },
+        beforeCreate () {
+            console.log('beforeCreate')
+        },
+        created () {
+            console.log('created')
+        },
+        beforeMount () {
+            console.log('beforeMount')
+        },
+        mounted () {
+            console.log('mounted')
+        },
+        beforeUpdate () {
+            console.log('beforeUpdate')
+        },
+        updated () {
+            console.log('updated')
+        },
+        activated () {
+            console.log('activated')
+        },
+        deactivated () {
+            console.log('deactivated')
+        },
+        beforeDestroy () {
+            console.log('beforeDestroy')
+        },
+        destroyed () {
+            console.log('destroyed')
+        },
+        errorCaptured () {
+            console.log('errorCaptured')
+        },
+        computed: {
+        },
+        watch: {
+        },
+        methods: {
+        },
+        created() {
+        },
+    })
+</script>
+</body>
+</html>
