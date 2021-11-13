@@ -12,7 +12,7 @@
 
   /*  */
 
-  var emptyObject = Object.freeze({});        // ？？？ 为什么要冻结空对象来用
+  var emptyObject = Object.freeze({});
 
   // These helpers produce better VM code in JS engines due to their
   // explicitness and function inlining.
@@ -35,7 +35,7 @@
   /**
    * Check if value is primitive.
    */
-  function isPrimitive(value) {   // 是否为原始类型
+  function isPrimitive(value) {   // 是否为基本类型
     return (
       typeof value === 'string' ||
       typeof value === 'number' ||
@@ -59,7 +59,7 @@
    */
   var _toString = Object.prototype.toString;
 
-  function toRawType(value) {     // 获取变量真实类型
+  function toRawType(value) {     // 获取真实类型
     return _toString.call(value).slice(8, -1)
   }
 
@@ -188,7 +188,7 @@
   /**
    * Hyphenate a camelCase string.
    */
-  var hyphenateRE = /\B([A-Z])/g;     // \B 排除首字母
+  var hyphenateRE = /\B([A-Z])/g;     // 驼峰转短横线命名 \B 排除首字母
   var hyphenate = cached(function (str) {
     return str.replace(hyphenateRE, '-$1').toLowerCase()    // 在字符串中的大写字母前加-，并且将整个字符串转换为小写
   });
@@ -625,8 +625,8 @@
     var classify = function (str) {
       return str  // 转换为大驼峰
         .replace(classifyRE, function (c) { return c.toUpperCase(); }) // 把首字符或-,_后的字符大写
-        .replace(/[-_]/g, '');
-    }; // 在把字符串里的-,_去掉
+        .replace(/[-_]/g, ''); // 在把字符串里的-,_去掉
+    };
 
     warn = function (msg, vm) {
       var trace = vm ? generateComponentTrace(vm) : '';
