@@ -12,10 +12,23 @@
 </div>
 <script src="libs/vue.js"></script>
 <script>
+    let count = 0
+    let obj = {}
+    Object.defineProperty(obj, 'bbb', {
+        get() {
+            return count
+        },
+        set() {
+            count++
+        }
+    })
     const app = new Vue({
         el: '#app',
-        data: {
-            aaa: 123
+        data() {
+            return {
+                aaa: 123,
+                bbb: obj.bbb
+            }
         },
         beforeCreate () {
             console.log('beforeCreate')
