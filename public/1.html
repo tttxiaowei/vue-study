@@ -9,6 +9,16 @@
 <body>
 <div id="app">
     {{ aaa }}
+    <div>
+        bbb
+        <div>
+            <i>
+                <span>aaa</span>
+            </i>
+        </div>
+    </div>
+    <div>bbb</div>
+    <div>{{ bbb }}</div>
 </div>
 <script src="libs/vue.js"></script>
 <script>
@@ -24,8 +34,25 @@
     })
     const app = new Vue({
         el: '#app',
+        props: {
+            pppp: Number
+        },
+        provide(){
+            return {
+                pro: 22
+            }
+        },
+        inject: ['pro'],
+        directives: {
+            focus: {
+                inserted: function (el) {
+                    el.focus()
+                }
+            }
+        },
         data() {
             return {
+                pro: 1111,
                 aaa: 123,
                 bbb: obj.bbb
             }
@@ -69,6 +96,11 @@
             }
         },
         watch: {
+            aaa: {
+                handler() {
+                    console.log('aaa changed')
+                }
+            }
         },
         methods: {
         },

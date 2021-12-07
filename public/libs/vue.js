@@ -1214,7 +1214,7 @@
     /**
      * Data
      */
-    function mergeDataOrFn(
+    function mergeDataOrFn( // 合并data, provide
       parentVal,
       childVal,
       vm
@@ -1235,7 +1235,7 @@
         return function mergedDataFn() {
           return mergeData(
             typeof childVal === 'function' ? childVal.call(this, this) : childVal,
-            typeof parentVal === 'function' ? parentVal.call(this, this) : parentVal    
+            typeof parentVal === 'function' ? parentVal.call(this, this) : parentVal
           )
         }
       } else {
@@ -1281,7 +1281,7 @@
     /**
      * Hooks and props are merged as arrays.
      */
-    function mergeHook(
+    function mergeHook( // 合并生命周期钩子，钩子全部转换成数组
       parentVal,
       childVal
     ) {
@@ -1297,7 +1297,7 @@
         : res
     }
 
-    function dedupeHooks(hooks) {
+    function dedupeHooks(hooks) { // 钩子去重
       var res = [];
       for (var i = 0; i < hooks.length; i++) {
         if (res.indexOf(hooks[i]) === -1) {
@@ -1318,16 +1318,16 @@
      * a three-way merge between constructor options, instance
      * options and parent options.
      */
-    function mergeAssets(
+    function mergeAssets( // 返回以parentVal为原型，拥有childVal所有属性的新对象
       parentVal,
       childVal,
       vm,
       key
     ) {
-      var res = Object.create(parentVal || null);
+      var res = Object.create(parentVal || null); // 以parentVal为原型创建空对象
       if (childVal) {
         assertObjectType(key, childVal, vm);
-        return extend(res, childVal)
+        return extend(res, childVal) // 将childVal的值都浅拷贝到res
       } else {
         return res
       }
@@ -1343,7 +1343,7 @@
      * Watchers hashes should not overwrite one
      * another, so we merge them as arrays.
      */
-    strats.watch = function (
+    strats.watch = function ( // 合并watch的策略
       parentVal,
       childVal,
       vm,
@@ -1353,13 +1353,13 @@
       if (parentVal === nativeWatch) { parentVal = undefined; }
       if (childVal === nativeWatch) { childVal = undefined; }
       /* istanbul ignore if */
-      if (!childVal) { return Object.create(parentVal || null) }
+      if (!childVal) { return Object.create(parentVal || null) } // 没有childVal，直接返回以parentVal为原型的空对象
       {
         assertObjectType(key, childVal, vm);
       }
-      if (!parentVal) { return childVal }
+      if (!parentVal) { return childVal } // 没有parentVal，直接返回childVal
       var ret = {};
-      extend(ret, parentVal);
+      extend(ret, parentVal); // 把parentVal复制到一个空对象
       for (var key$1 in childVal) {
         var parent = ret[key$1];
         var child = childVal[key$1];
@@ -1367,7 +1367,7 @@
           parent = [parent];
         }
         ret[key$1] = parent
-          ? parent.concat(child)
+          ? parent.concat(child)  // 如果parentVal和childVal有相同的key，合并为一个数组
           : Array.isArray(child) ? child : [child];
       }
       return ret
@@ -1379,7 +1379,7 @@
     strats.props =
       strats.methods =
       strats.inject =
-      strats.computed = function (
+      strats.computed = function ( // 先讲parentVal的属性合到ret，再把childVal合到ret，返回ret
         parentVal,
         childVal,
         vm,
@@ -1509,7 +1509,7 @@
       }
     }
 
-    function assertObjectType(name, value, vm) {
+    function assertObjectType(name, value, vm) { // value不是纯对象就报warn
       if (!isPlainObject(value)) {
         warn(
           "Invalid value for option \"" + name + "\": expected an Object, " +
@@ -1557,11 +1557,11 @@
 
       var options = {};
       var key;
-      for (key in parent) {
-        mergeField(key); // 合并parent上的属性
+      for (key in parent) { // 合并parent上的属性到options
+        mergeField(key);
       }
-      for (key in child) {
-        if (!hasOwn(parent, key)) { // 合并parent上没有的属性、child上有的属性
+      for (key in child) { // 合并parent上没有的属性、child上有的属性到options
+        if (!hasOwn(parent, key)) {
           mergeField(key);
         }
       }
@@ -1763,16 +1763,16 @@
      * because a simple equality check will fail when running
      * across different vms / iframes.
      */
-    function getType(fn) {
+    function getType(fn) { // 获取函数名
       var match = fn && fn.toString().match(/^\s*function (\w+)/);
       return match ? match[1] : ''
     }
 
-    function isSameType(a, b) {
+    function isSameType(a, b) { // 判断a和b是不是一个构造函数
       return getType(a) === getType(b)
     }
 
-    function getTypeIndex(type, expectedTypes) {
+    function getTypeIndex(type, expectedTypes) { // 在expectedTypes中找到type，返回索引，没找到就返回-1
       if (!Array.isArray(expectedTypes)) {
         return isSameType(expectedTypes, type) ? 0 : -1
       }
@@ -1856,7 +1856,7 @@
       }
     }
 
-    function invokeWithErrorHandling(
+    function invokeWithErrorHandling( // 调用函数，并且处理该函数返回结果为promise时，个这个promise添加catch处理方法
       handler,
       context,
       args,
@@ -2048,7 +2048,7 @@
         'require' // for Webpack/Browserify
       );
 
-      var warnNonPresent = function (target, key) { // vm上没有获取到，贼报警
+      var warnNonPresent = function (target, key) { // vm上没有获取到，就报警
         warn(
           "Property or method \"" + key + "\" is not defined on the instance but " +
           'referenced during render. Make sure that this property is reactive, ' +
@@ -2437,11 +2437,11 @@
       }
     }
 
-    function initInjections(vm) {
+    function initInjections(vm) { // 初始化inject
       var result = resolveInject(vm.$options.inject, vm);
       if (result) {
         toggleObserving(false);
-        Object.keys(result).forEach(function (key) {
+        Object.keys(result).forEach(function (key) { // 将从祖先组件provide的属性定义到vm上
           /* istanbul ignore else */
           {
             defineReactive$$1(vm, key, result[key], function () {
@@ -2458,7 +2458,7 @@
       }
     }
 
-    function resolveInject(inject, vm) {
+    function resolveInject(inject, vm) { // 处理inject
       if (inject) {
         // inject is :any because flow is not smart enough to figure out cached
         var result = Object.create(null);
@@ -2472,25 +2472,25 @@
           if (key === '__ob__') { continue }
           var provideKey = inject[key].from;
           var source = vm;
-          while (source) {
+          while (source) { // 一直找父组件，直到找到provide了同名属性的祖先组件
             if (source._provided && hasOwn(source._provided, provideKey)) {
-              result[key] = source._provided[provideKey];
+              result[key] = source._provided[provideKey]; // 将祖先组件provide的属性收集到result
               break
             }
             source = source.$parent;
           }
           if (!source) {
-            if ('default' in inject[key]) {
+            if ('default' in inject[key]) { // 如果inject提供了默认值，就取默认值
               var provideDefault = inject[key].default;
               result[key] = typeof provideDefault === 'function'
                 ? provideDefault.call(vm)
                 : provideDefault;
             } else {
-              warn(("Injection \"" + key + "\" not found"), vm);
+              warn(("Injection \"" + key + "\" not found"), vm); // 祖先没找到还没默认值，报warn
             }
           }
         }
-        return result
+        return result // 返回所有祖先组件有provide的属性
       }
     }
 
@@ -4215,7 +4215,7 @@
       }
     }
 
-    function callHook(vm, hook) {
+    function callHook(vm, hook) { // 调用生命周期钩子
       // #7573 disable dep collection when invoking lifecycle hooks
       pushTarget();
       var handlers = vm.$options[hook];
@@ -6831,7 +6831,7 @@
 
     var validDivisionCharRE = /[\w).+\-_$\]]/;
 
-    function parseFilters(exp) {
+    function parseFilters(exp) { // 处理模板中的字符串表达式
       var inSingle = false;
       var inDouble = false;
       var inTemplateString = false;
@@ -7082,7 +7082,7 @@
         el.rawAttrsMap[name]
     }
 
-    function getBindingAttr(
+    function getBindingAttr( // 解析模板中的属性
       el,
       name,
       getStatic
@@ -7090,10 +7090,10 @@
       var dynamicValue =
         getAndRemoveAttr(el, ':' + name) ||
         getAndRemoveAttr(el, 'v-bind:' + name);
-      if (dynamicValue != null) {
+      if (dynamicValue != null) { // 对v-bind绑定的动态属性进行解析
         return parseFilters(dynamicValue)
       } else if (getStatic !== false) {
-        var staticValue = getAndRemoveAttr(el, name);
+        var staticValue = getAndRemoveAttr(el, name); // 处理属性值为静态字符串的情况
         if (staticValue != null) {
           return JSON.stringify(staticValue)
         }
@@ -7104,14 +7104,14 @@
     // doesn't get processed by processAttrs.
     // By default it does NOT remove it from the map (attrsMap) because the map is
     // needed during codegen.
-    function getAndRemoveAttr(
+    function getAndRemoveAttr( // 从ast元素的中删除某个属性
       el,
       name,
       removeFromMap
     ) {
       var val;
       if ((val = el.attrsMap[name]) != null) {
-        var list = el.attrsList;
+        var list = el.attrsList; // 删除attrsList中的属性
         for (var i = 0, l = list.length; i < l; i++) {
           if (list[i].name === name) {
             list.splice(i, 1);
@@ -7119,7 +7119,7 @@
           }
         }
       }
-      if (removeFromMap) {
+      if (removeFromMap) { // 连attrsMap中的属性也删除
         delete el.attrsMap[name];
       }
       return val
@@ -9088,12 +9088,12 @@
 
 
 
-    function parseText(
+    function parseText( // 处理文本中的{{}}
       text,
       delimiters
     ) {
       var tagRE = delimiters ? buildRegex(delimiters) : defaultTagRE;
-      if (!tagRE.test(text)) {
+      if (!tagRE.test(text)) { // 没有{{}}的纯文本直接返回
         return
       }
       var tokens = [];
@@ -9216,10 +9216,10 @@
     var decoder;
 
     var he = {
-      decode: function decode(html) {
+      decode: function decode(html) { // 对文本进行编码
         decoder = decoder || document.createElement('div');
         decoder.innerHTML = html;
-        return decoder.textContent          // textContent：元素及其子孙节点的文本
+        return decoder.textContent          // textContent：元素及其子孙节点的文本，性能好些，因为innerText会触发回流
       }
     };
 
@@ -9689,7 +9689,7 @@
         }
       }
 
-      function trimEndingWhitespace(el) {
+      function trimEndingWhitespace(el) { // 删除children结束位置的所有空文本节点
         // remove trailing whitespace node
         if (!inPre) {
           var lastNode;
@@ -9703,15 +9703,15 @@
         }
       }
 
-      function checkRootConstraints(el) {
-        if (el.tag === 'slot' || el.tag === 'template') {
+      function checkRootConstraints(el) { // 检查root标签
+        if (el.tag === 'slot' || el.tag === 'template') { // 不能是slot和template
           warnOnce(
             "Cannot use <" + (el.tag) + "> as component root element because it may " +
             'contain multiple nodes.',
             { start: el.start }
           );
         }
-        if (el.attrsMap.hasOwnProperty('v-for')) {
+        if (el.attrsMap.hasOwnProperty('v-for')) { // 根元素必须唯一
           warnOnce(
             'Cannot use v-for on stateful component root element because ' +
             'it renders multiple elements.',
@@ -9822,7 +9822,7 @@
           stack.length -= 1;      // 将stack中最后一个元素去掉
           currentParent = stack[stack.length - 1];
           if (options.outputSourceRange) {
-            element.end = end$1;
+            element.end = end$1; // 更新标签的结束位置
           }
           closeElement(element);      // 克隆stack中最后一个元素
         },
@@ -9853,8 +9853,8 @@
             return
           }
           var children = currentParent.children;
-          if (inPre || text.trim()) {
-            text = isTextTag(currentParent) ? text : decodeHTMLCached(text);
+          if (inPre || text.trim()) { // 如果text需要处理
+            text = isTextTag(currentParent) ? text : decodeHTMLCached(text); // 对script、style之外的其他标签编码
           } else if (!children.length) {
             // remove the whitespace-only node right after an opening tag
             text = '';
@@ -9918,7 +9918,7 @@
       return root
     }
 
-    function processPre(el) {
+    function processPre(el) { // 处理v-pre
       if (getAndRemoveAttr(el, 'v-pre') != null) {
         el.pre = true;
       }
@@ -9945,7 +9945,7 @@
       }
     }
 
-    function processElement(
+    function processElement( // 处理ast元素
       element,
       options
     ) {
@@ -9970,7 +9970,7 @@
       return element
     }
 
-    function processKey(el) {
+    function processKey(el) { // 处理:key
       var exp = getBindingAttr(el, 'key');
       if (exp) {
         {
@@ -9997,11 +9997,11 @@
       }
     }
 
-    function processRef(el) {
+    function processRef(el) { // 处理:ref
       var ref = getBindingAttr(el, 'ref');
       if (ref) {
         el.ref = ref;
-        el.refInFor = checkInFor(el);
+        el.refInFor = checkInFor(el); // 检查ref是否在v-for内
       }
     }
 
@@ -10022,7 +10022,7 @@
 
 
 
-    function parseFor(exp) {
+    function parseFor(exp) { // 处理v-for
       var inMatch = exp.match(forAliasRE);
       if (!inMatch) { return }
       var res = {};
@@ -10041,7 +10041,7 @@
       return res
     }
 
-    function processIf(el) {
+    function processIf(el) { // 处理v-if
       var exp = getAndRemoveAttr(el, 'v-if');
       if (exp) {
         el.if = exp;
@@ -10110,12 +10110,12 @@
 
     // handle content being passed to a component as slot,
     // e.g. <template slot="xxx">, <div slot-scope="xxx">
-    function processSlotContent(el) {
+    function processSlotContent(el) { // 处理插槽
       var slotScope;
       if (el.tag === 'template') {
         slotScope = getAndRemoveAttr(el, 'scope');
         /* istanbul ignore if */
-        if (slotScope) {
+        if (slotScope) { // template标签加slotScope的写法被弃用了
           warn$2(
             "the \"scope\" attribute for scoped slots have been deprecated and " +
             "replaced by \"slot-scope\" since 2.5. The new \"slot-scope\" attribute " +
@@ -10128,7 +10128,7 @@
         el.slotScope = slotScope || getAndRemoveAttr(el, 'slot-scope');
       } else if ((slotScope = getAndRemoveAttr(el, 'slot-scope'))) {
         /* istanbul ignore if */
-        if (el.attrsMap['v-for']) {
+        if (el.attrsMap['v-for']) { // slot-scope不能和v-for一起用
           warn$2(
             "Ambiguous combined usage of slot-scope and v-for on <" + (el.tag) + "> " +
             "(v-for takes higher priority). Use a wrapper <template> for the " +
@@ -10406,9 +10406,9 @@
       }
     }
 
-    function checkInFor(el) {
+    function checkInFor(el) { // 检查ref是否在v-for内
       var parent = el;
-      while (parent) {
+      while (parent) { // 检查所有祖先元素是否有v-for
         if (parent.for !== undefined) {
           return true
         }
@@ -10620,7 +10620,7 @@
      *    create fresh nodes for them on each re-render;
      * 2. Completely skip them in the patching process.
      */
-    function optimize(root, options) {
+    function optimize(root, options) { // 优化ast树，标记静态html节点
       if (!root) { return }
       isStaticKey = genStaticKeysCached(options.staticKeys || '');
       isPlatformReservedTag = options.isReservedTag || no;
@@ -10637,7 +10637,7 @@
       )
     }
 
-    function markStatic$1(node) {
+    function markStatic$1(node) { // 标记ast中的静态html节点
       node.static = isStatic(node);
       if (node.type === 1) {
         // do not make component slot content static. this avoids
@@ -10650,10 +10650,10 @@
         ) {
           return
         }
-        for (var i = 0, l = node.children.length; i < l; i++) {
+        for (var i = 0, l = node.children.length; i < l; i++) { // 遍历所有子孙节点，判断是不是static节点
           var child = node.children[i];
           markStatic$1(child);
-          if (!child.static) {
+          if (!child.static) { // 只要子孙节点有不是static节点，那祖先节点node就不是static
             node.static = false;
           }
         }
@@ -10669,7 +10669,7 @@
       }
     }
 
-    function markStaticRoots(node, isInFor) {
+    function markStaticRoots(node, isInFor) { // 遍历所有节点，标记子孙节点都是static节点的这一个祖先节点，staticRoot属性为true
       if (node.type === 1) {
         if (node.static || node.once) {
           node.staticInFor = isInFor;
@@ -10681,7 +10681,7 @@
           node.children.length === 1 &&
           node.children[0].type === 3
         )) {
-          node.staticRoot = true;
+          node.staticRoot = true; // 找到这个static节点祖先节点就返回，不再标记子孙节点
           return
         } else {
           node.staticRoot = false;
@@ -10699,20 +10699,20 @@
       }
     }
 
-    function isStatic(node) {
-      if (node.type === 2) { // expression
+    function isStatic(node) { // 判断ast节点是不是静态节点
+      if (node.type === 2) { // expression 表达式节点
         return false
       }
-      if (node.type === 3) { // text
+      if (node.type === 3) { // text 文本节点
         return true
       }
       return !!(node.pre || (
-        !node.hasBindings && // no dynamic bindings
+        !node.hasBindings && // no dynamic bindings 没有动态绑定
         !node.if && !node.for && // not v-if or v-for or v-else
-        !isBuiltInTag(node.tag) && // not a built-in
-        isPlatformReservedTag(node.tag) && // not a component
+        !isBuiltInTag(node.tag) && // not a built-in 不是vue内置标签
+        isPlatformReservedTag(node.tag) && // not a component 是浏览器原生标签
         !isDirectChildOfTemplateFor(node) &&
-        Object.keys(node).every(isStaticKey)
+        Object.keys(node).every(isStaticKey) // 节点的所有属性，都是静态节点才会有的属性
       ))
     }
 
@@ -10938,7 +10938,7 @@
 
 
 
-    function generate(
+    function generate( // 根据ast生成页面渲染代码
       ast,
       options
     ) {
@@ -11843,7 +11843,7 @@
     ) {
       var ast = parse(template.trim(), options);      // 解析html模板为ast节点
       if (options.optimize !== false) {
-        optimize(ast, options);             // 遍历ast节点
+        optimize(ast, options);             // 优化ast节点，标记静态节点
       }
       var code = generate(ast, options);
       return {
